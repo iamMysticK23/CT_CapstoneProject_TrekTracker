@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import YouTube from 'react-youtube';
 
 // internal imports
-import homepage_image from '../../assets/Images/trektracker_hp.jpeg'
+import homepage_image from '../../assets/Images/trektracker_hp.jpeg';
+import { NavBar } from '../sharedComponents';
 
 interface Props {
   title: string;
@@ -42,11 +43,11 @@ const HomePageText = styled('div')({
 
 const VideoContainer = styled('div')({
   position: 'absolute',
-  top: '40px',
-  left: '10px',
+  top: '60px',
+  left: '105px',
   width: '100%',
   height: 'calc(100% - 40px)',
-  opacity: '0.7'
+  opacity: '0.5'
 });
 
 
@@ -63,8 +64,9 @@ const opts = {
     autoplay: 1,
     mute: 1,
     modestbranding: 1,
-    showingo: 0,
+    showinfo: 0,
     controls: 0,
+   
   },
 };
 
@@ -80,6 +82,7 @@ const YouTubeVideo = () => {
 export const Home = (props: Props) => {
   return (
     <Root>
+      <NavBar />
       <Main>
         <HomePageText>
             <h1>{props.title} - Find Your Next Adventure.</h1>
@@ -87,10 +90,6 @@ export const Home = (props: Props) => {
             <Button sx = {{
                  marginTop: '10px',
                  color: 'white',
-                 backgroundColor: 'green',
-                 '&:hover': {
-                    backgroundColor: 'darkgreen',
-                 }
                  }} 
                  component={Link} to={'/'} variant='contained'
                  >Register/Sign In</Button> {/*need to link to the button */}
