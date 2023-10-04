@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState, useEffect } from 'react';
 import { styled } from '@mui/system';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import YouTube from 'react-youtube';
+
 
 // internal imports
 import homepage_image from '../../assets/Images/trektracker_hp.jpeg';
@@ -79,7 +80,27 @@ const YouTubeVideo = () => {
   );
 };
 
+
+
+
 export const Home = (props: Props) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(localStorage.getItem('auth') === 'true');
+
+  useEffect(() => {
+    const updateAuth = () => {
+      setIsAuthenticated(localStorage.getItem('auth') === 'true');
+    };
+
+    // Add event listener for localStorage changes
+    window.addEventListener('storage', updateAuth);
+
+    return () => {
+      // Cleanup the event listener on component unmount
+      window.removeEventListener('storage', updateAuth);
+    };
+  }, []);
+
+
   return (
     <Root>
       <NavBar />
@@ -91,8 +112,8 @@ export const Home = (props: Props) => {
                  marginTop: '10px',
                  color: 'white',
                  }} 
-                 component={Link} to={'/auth'} variant='contained'
-                 >Register/Sign In</Button> {/*need to link to the button */}
+                 component={Link} to={ isAuthenticated ? '/googlemap' : '/auth'} variant='contained'
+                 > { isAuthenticated ? 'Discover Trails' : 'Register/Login'}</Button> 
         </HomePageText>
         <YouTubeVideo />
 

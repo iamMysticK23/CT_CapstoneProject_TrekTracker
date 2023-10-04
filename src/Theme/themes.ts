@@ -7,13 +7,13 @@ export const theme = createTheme({
     },
     palette: {
         primary: {
-            main:'#5b8c57' // green
+            main:'#32453c' // green
         },
         secondary: {
             main: '#373837' // grey
         },
         info : {
-            main: '#d4af42' //dark yellow
+            main: '#b3b186' //dark yellow
         }
     }
 })

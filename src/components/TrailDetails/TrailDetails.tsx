@@ -1,10 +1,14 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+
 
 
 // internal imports
 import { NavBar } from '../sharedComponents';
 
 export const TrailDetails = () => {
+
+
+
     return (
         <div>
             <NavBar />

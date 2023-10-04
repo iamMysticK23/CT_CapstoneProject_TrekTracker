@@ -27,8 +27,10 @@ import PermMediaIcon from '@mui/icons-material/PermMedia';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import LoginIcon from '@mui/icons-material/Login';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
+import { signOut, getAuth } from 'firebase/auth';
 
 
 // internal imports
@@ -102,18 +104,16 @@ const navStyles = {
     }
 }
 
-// interface NavBarProps {
-//     isAuthenticated: boolean;
-// }
 
+// NavBar component 
 
-// NavBar component build out
-// I will need to implement search bar and person icon
 export const NavBar = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
     const [ open, setOpen ] = useState(location.pathname === '/googlemap');
+    const myAuth = localStorage.getItem('auth')
+    const auth = getAuth()
 
 
     const handleDrawerOpen = () => {
@@ -129,27 +129,49 @@ export const NavBar = () => {
             text: 'Home',
             icon: <HomeIcon />,
             onClick: () => {navigate('/')},
-            // show: () => true 
+           
         },
         {
-            text: 'Discover',
-            icon:<HikingIcon />,
-            onClick: () => {navigate('/googlemap')},
-            // show: () => true 
+            text: myAuth === 'true' ? 'Discover' : 'Sign In' ,
+            icon: myAuth === 'true' ? <HikingIcon /> : <LoginIcon />, 
+            onClick: () => {navigate(myAuth === 'true' ? '/googlemap' : '/auth')},
+          
         },
         {
-            text: 'MyTrails',
-            icon: <PermMediaIcon />,
-            onClick: () => {navigate('/traillist')},
-            // show: () => true 
+            text: myAuth === 'true' ? 'MyTrails' : '',
+            icon: myAuth === 'true' ? <PermMediaIcon /> : '',
+            onClick: myAuth === 'true' ? () => {navigate('/traillist')} : () => {},
+           
         },
         {
-            text: 'My Profile',
-            icon: <AccountCircleIcon />,
-            onClick: () => {navigate('/profile')},
-            // show: () => true 
+            text: myAuth === 'true' ? 'My Profile' : '',
+            icon: myAuth === 'true' ? <AccountCircleIcon /> : '',
+            onClick: myAuth === 'true' ? () => {navigate('/profile')} : () => {},
+           
         },
     ]
+
+    let signInText = 'Log In'
+
+    if (myAuth === 'true'){
+        signInText = 'Log Out'
+    }
+    
+    const signInButton = async () => {
+        if (myAuth === 'false'){
+            navigate('/auth')
+        } else {
+           await signOut(auth)
+           localStorage.setItem('auth', 'false')
+           localStorage.setItem('token', '')
+           localStorage.setItem('user', '')
+           setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+           navigate('/')
+        }
+    }
+
 
     const [isDarkMode, setIsDarkMode] = useState(false);
     const toggleDarkMode = () => {
@@ -188,23 +210,22 @@ export const NavBar = () => {
                     </IconButton>
                 </Toolbar>
                 <Stack direction='row' justifyContent='space-between' alignItems='center' sx={ navStyles.signInStack }>
-                    <Typography variant='body2' sx={{color: 'inherit'}}>
-                        {/* below will change */}
-                        User Email
+                    <Typography variant='body2' sx={{color: 'orange', fontWeight:'bold'}}>
+                        {localStorage.getItem('user')}
                     </Typography>
                     <Button
-                        variant ='outlined'
+                        variant ='contained'
                         color ='info'
-                        size = 'medium'
+                        size = 'small'
                         sx = {{ marginLeft: '20px'}}
-                        onClick = { () => {navigate('/auth')}}
+                        onClick = { signInButton }
                     >
-                        Sign In
+                       { signInText }
                     </Button>
                     <Button
-                        variant ='outlined'
+                        variant ='contained'
                         color ='info'
-                        size = 'medium'
+                        size = 'small'
                         sx = {{ marginLeft: '20px'}}
                         onClick = { toggleDarkMode }
                     >
