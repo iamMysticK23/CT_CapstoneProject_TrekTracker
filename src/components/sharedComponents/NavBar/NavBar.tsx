@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Button,
     Drawer,
@@ -20,7 +20,7 @@ import {
 
 } from '@mui/material';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import HikingIcon from '@mui/icons-material/Hiking';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
@@ -102,12 +102,18 @@ const navStyles = {
     }
 }
 
+// interface NavBarProps {
+//     isAuthenticated: boolean;
+// }
+
 
 // NavBar component build out
 // I will need to implement search bar and person icon
 export const NavBar = () => {
+
     const navigate = useNavigate();
-    const [ open, setOpen ] = useState(false);
+    const location = useLocation();
+    const [ open, setOpen ] = useState(location.pathname === '/googlemap');
 
 
     const handleDrawerOpen = () => {
@@ -122,24 +128,46 @@ export const NavBar = () => {
         {
             text: 'Home',
             icon: <HomeIcon />,
-            onClick: () => {navigate('/')}
+            onClick: () => {navigate('/')},
+            // show: () => true 
         },
         {
             text: 'Discover',
             icon:<HikingIcon />,
-            onClick: () => {navigate('/googlemap')}
+            onClick: () => {navigate('/googlemap')},
+            // show: () => true 
         },
         {
             text: 'MyTrails',
             icon: <PermMediaIcon />,
-            onClick: () => {navigate('/traillist')}
+            onClick: () => {navigate('/traillist')},
+            // show: () => true 
         },
         {
             text: 'My Profile',
             icon: <AccountCircleIcon />,
-            onClick: () => {navigate('/profile')}
+            onClick: () => {navigate('/profile')},
+            // show: () => true 
         },
     ]
+
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const toggleDarkMode = () => {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        const isCurrentlyEnabled = body.classList.contains('dark-mode');
+        localStorage.setItem('dark-mode-enabled', isCurrentlyEnabled.toString());
+
+        setIsDarkMode(isCurrentlyEnabled);
+    };
+
+    // Check if dark mode is enabled in localStorage
+    useEffect(() => {
+        const isDarkModeEnabled = localStorage.getItem('dark-mode-enabled');
+        if (isDarkModeEnabled === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    }, []);
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -173,6 +201,15 @@ export const NavBar = () => {
                     >
                         Sign In
                     </Button>
+                    <Button
+                        variant ='outlined'
+                        color ='info'
+                        size = 'medium'
+                        sx = {{ marginLeft: '20px'}}
+                        onClick = { toggleDarkMode }
+                    >
+                       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                    </Button>
                 </Stack>
             </AppBar>
             <Drawer
@@ -188,24 +225,26 @@ export const NavBar = () => {
                 </Box>
                 <Divider />
                 <List>
-                    { navLinks.map((item) => {
-                        const { text, icon, onClick } = item;
-                        return (
-                            <ListItemButton 
-                            key={text} 
-                            onClick={onClick}
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center', // Center icons vertically
-                                padding: '8px', // Add padding for spacing
-                            }}
-                            >
-                                { icon }
+{ 
+                      navLinks.map((item) =>  {
+                            const { text, icon, onClick } = item;
+                            return (
+                                <ListItemButton 
+                                key={text} 
+                                onClick={onClick}
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    padding: '8px',
+                                }}
+                                >
+                                    { icon }
                                     <ListItemText primary={text} sx={{ fontSize: '0.3rem'}} />
-                            </ListItemButton>
-                        )
-                    })}
+                                </ListItemButton>
+                            )
+                        })
+                    }
                 </List>
             </Drawer>
         </Box>

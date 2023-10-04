@@ -8,7 +8,7 @@ export const TrailDetails = () => {
     return (
         <div>
             <NavBar />
-            <h1>Trail Details - left hand scroll - may not need this</h1>
+            <h1 className="headertext">Trail Details - left hand scroll - may not need this</h1>
         </div>
     )
 }

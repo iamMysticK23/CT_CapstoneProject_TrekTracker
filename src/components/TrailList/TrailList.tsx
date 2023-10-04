@@ -8,7 +8,7 @@ export const TrailList = () => {
     return (
         <div>
             <NavBar />
-            <h1>Trail List - left side scroll - may not need this</h1>
+            <h1 className="headertext">Trail List - some cards with saved trail info</h1>
         </div>
     )
 }

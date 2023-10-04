@@ -10,3 +10,23 @@ body {
   font-family: 'Inter', sans-serif;
   font-family: 'Poppins', sans-serif;
 }
+
+body.dark-mode {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.headertext {
+  margin-top: 60px;
+  padding: 10px;
+
+  /* Flexbox styles to center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Assuming you want the text block itself to be full-width */
+  width: 100%;
+  text-align: center;
+}
+

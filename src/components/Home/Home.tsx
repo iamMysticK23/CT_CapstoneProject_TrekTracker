@@ -43,7 +43,7 @@ const HomePageText = styled('div')({
 
 const VideoContainer = styled('div')({
   position: 'absolute',
-  top: '60px',
+  top: '90px',
   left: '105px',
   width: '100%',
   height: 'calc(100% - 40px)',
@@ -91,7 +91,7 @@ export const Home = (props: Props) => {
                  marginTop: '10px',
                  color: 'white',
                  }} 
-                 component={Link} to={'/'} variant='contained'
+                 component={Link} to={'/auth'} variant='contained'
                  >Register/Sign In</Button> {/*need to link to the button */}
         </HomePageText>
         <YouTubeVideo />

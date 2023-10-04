@@ -8,7 +8,7 @@ export const UserProfile = () => {
     return (
         <div>
             <NavBar />
-            <h1>User Profile page - saved trails - photos - etc </h1>
+            <h1 className="headertext">User Profile page - saved trails - photos - etc </h1>
         </div>
     )
 }
