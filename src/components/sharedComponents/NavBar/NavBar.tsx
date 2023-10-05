@@ -13,24 +13,17 @@ import {
     Divider,
     CssBaseline,
     Box,
-    InputBase,
-    Menu,
-    Icon,
-    ListItemIcon,
 
 } from '@mui/material';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
-import HikingIcon from '@mui/icons-material/Hiking';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import LoginIcon from '@mui/icons-material/Login';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
-import SearchIcon from '@mui/icons-material/Search';
-import MenuIcon from '@mui/icons-material/Menu';
 import { signOut, getAuth } from 'firebase/auth';
 
 

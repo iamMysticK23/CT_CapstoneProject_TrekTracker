@@ -2,8 +2,8 @@ import { db } from '../../firebaseConfig'
 import React, { useRef, useState, useEffect } from 'react';
 import { GoogleMap, useLoadScript, Marker,  Library } from "@react-google-maps/api";
 import { NavBar } from '../sharedComponents';
-import { collection, addDoc } from 'firebase/firestore';
-import { TrailDetails } from '../TrailDetails';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+
 import { Button , Snackbar, Alert } from '@mui/material'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -104,6 +104,14 @@ export const MyGoogleMap = () => {
             setOpenSnackbar(true);
             return;
         }
+
+        const trailExists = await trailExistsInFirestore(trail.id, currentUser.uid);
+        if (trailExists) {
+            setSnackbarMessage("Trail already in profile.");
+            setSnackbarSeverity('warning');
+            setOpenSnackbar(true);
+            return;
+        }
     
         const trailWithUserId = {
             ...trail,
@@ -122,6 +130,12 @@ export const MyGoogleMap = () => {
         }
     };
     
+    // trail exists in db
+    const trailExistsInFirestore = async (trailID: number, userID: string) => {
+        const trailCollection = collection(db, 'trails');
+        const trailSnapshot = await getDocs(query(trailCollection, where("id", "==", trailID), where("userID", "==", userID)));
+        return !trailSnapshot.empty; // returns true if trail exists, false otherwise
+    };
 
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4", // Replace with your Google Maps API key

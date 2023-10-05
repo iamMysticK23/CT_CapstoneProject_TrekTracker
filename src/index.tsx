@@ -10,8 +10,7 @@ import {
         AdminPage,
         AuthComponent, 
         MyGoogleMap, 
-        Home,
-        TrailDetails, 
+        Home, 
         TrailList, 
         UserProfile } from './components';
 import { theme } from './Theme/themes';
@@ -29,7 +28,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/auth' element= {<AuthComponent title={'TrekTracker'} />} />
             <Route path='/admin' element= {<AdminPage/>} />
             <Route path='/googlemap' element= {<MyGoogleMap/>} />
-            <Route path='/traildetails' element= {<TrailDetails/>} />
             <Route path='/traillist' element= {<TrailList/>} />
             <Route path='/profile' element= {<UserProfile/>} />
           </Routes>
