@@ -5,8 +5,12 @@ import { db } from '../../firebaseConfig';
 import {Button, Snackbar, Alert } from '@mui/material';
 // import firebase from "firebase/compat/app"; // Use compat version for v9+
 import { getAuth } from 'firebase/auth';
+import { textAlign } from '@mui/system';
 
 // import "firebase/compat/auth";
+
+// internal imports
+import trailList_image from '../../assets/Images/trail_list.jpeg';
 
 type Trail = {
     id: string;
@@ -82,81 +86,140 @@ export const TrailList = () => {
             console.error("Error saving notes: ", error);
         }
     }
-    
-    
+// change color when delete button is hovered over
+    const [isDeleteHovered, setIsDeleteHovered] = useState(false);
+
+    const handleMouseEnterDelete = () => {
+        setIsDeleteHovered(true);
+    }
+
+    const handleMouseLeaveDelete = () => {
+        setIsDeleteHovered(false);
+    }
+
+    const [isSaveHovered, setIsSaveHovered] = useState(false);
+
+    const handleMouseEnterSave = () => {
+        setIsSaveHovered(true);
+    }
+
+    const handleMouseLeaveSave = () => {
+        setIsSaveHovered(false);
+    }
+
 
     return (
-        <div>
-            <NavBar />
-            <h1 className="headertext">Trail List</h1>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px'}}>
+        <div style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0, 0.2), rgba(0,0,0, 0.5)), url(${trailList_image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment:'fixed',
+            minHeight: '100vh',  // Adjust based on your preference
+            width: '100%',
+            overflow: 'auto'    // Adjust based on your preference
+        }}>
+          <NavBar />
+          <h1 className="headertext" style={{color:'#915c33' , fontWeight: 'bold'}}>My Saved Trail List</h1>
+          <p style = {{textAlign: 'center' , color: 'white', fontWeight: 'bold'}}>The information cards are scrollable.</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', height: '100vh', width: '100vw', padding: '20px', marginLeft: '70px'}}>
             {trails.map(trail => (
-                <div key={trail.id} 
-                style={{
-                    border: '1px solid #ccc', 
-                    padding: '10px', 
+              <div key={trail.id} style={{ width: 'calc(80% - 10px)', display: 'flex', flexDirection: 'row', margin: '20px' }}>
+                
+                {/* Trail Card */}
+                <div
+                  style={{
+                    border: '1px solid #ccc',
+                    padding: '10px',
                     borderRadius: '5px',
                     backgroundColor: '#32453C',
-                    color: 'white'
+                    color: 'white',
+                    cursor: 'pointer',
+                    flex: '70%',
+                    marginRight: '10px',
+                    height: '500px',
+                    overflow: 'auto'
+                  }}
+                >
+                  <img
+                    src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'}
+                    alt="trail image"
+                    style={{
+                      width: '90%',
+                      height: '80%',
+                      objectFit: 'cover',
+                      marginLeft: '50px',
+                      marginTop: '15px'
+                     
                     }}
-                    
-                    >
-                        <img src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'} 
-                        alt="trail image" 
-                         style={{  
-                            display: 'block', 
-                            margin: '0 auto', 
-                            width: '500px',
-                            height: '300px', 
-                            objectFit: 'cover' 
-                            }} 
-                            />
-                        <h2>{trail.name}</h2>
-                        <br />
-                        <p><strong>City:</strong> {trail.city}</p>
-                        <p><strong>Region:</strong> {trail.region}</p>
-                        <p><strong>Length:</strong> {trail.length} miles</p>
-                        <p><strong>Rating:</strong> {trail.rating} </p>
-                        <br />
-                        <p><strong>Description:</strong> {trail.description} </p>
-                        <br />
-                        <p><strong>Directions:</strong> {trail.directions} </p>
-                        <p><strong>URL:</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
-                        <Button onClick={() => deleteTrail(trail.id)} style={{marginTop: '10px', backgroundColor: 'darkred', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Delete</Button>
-                        <textarea 
-                        value={trail.notes || ''}
-                        placeholder="Add your notes here..."
-                        onChange={(e) => handleNoteChange(e, trail.id)}
-                        style={{ width: '100%', height: '100px', marginTop: '10px' }}
-                    />
-                    <button onClick={() => { if (trail.notes) saveNotes(trail.id, trail.notes); }} style={{marginTop: '10px', backgroundColor: 'darkorange', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Save Notes</button>
-
-                    </div>
-                ))}
-
-
-            </div>
-            <Snackbar 
-    open={openDeleteSnackbar} 
-    autoHideDuration={3000} 
-    onClose={() => setOpenDeleteSnackbar(false)}
-    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
->
-    <Alert onClose={() => setOpenDeleteSnackbar(false)} severity="success" variant="filled">
-        Trail has been deleted!
-    </Alert>
-</Snackbar>
-<Snackbar 
-    open={openNoteSavedSnackbar} 
-    autoHideDuration={3000} 
-    onClose={() => setOpenNoteSavedSnackbar(false)}
-    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
->
-    <Alert onClose={() => setOpenNoteSavedSnackbar(false)} severity="success" variant="filled">
-        Note has been saved!
-    </Alert>
-</Snackbar>
-
+                  />
+                  <h2>{trail.name}</h2>
+                  <p><strong>City:</strong> {trail.city}</p>
+                  <p><strong>Region:</strong> {trail.region}</p>
+                  <p><strong>Length:</strong> {trail.length} miles</p>
+                  <p><strong>Rating:</strong> {trail.rating} </p>
+                  <p><strong>Description:</strong> {trail.description} </p>
+                  <p><strong>Directions:</strong> {trail.directions} </p>
+                  <p><strong>URL:</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word' }}>{trail.url}</a></p>
+                  <Button onClick={() => deleteTrail(trail.id)} 
+                          onMouseEnter={handleMouseEnterDelete}
+                          onMouseLeave={handleMouseLeaveDelete}
+                  style={{ 
+                    marginTop: '20px',
+                     marginBottom:'20px', 
+                     backgroundColor:  isDeleteHovered ? '#8a2b1a' : '#a33724', 
+                     color: 'white', 
+                     border: 'none', 
+                     padding: '10px',
+                     borderRadius: '5px',
+                     cursor: 'pointer' }}>Delete Trail</Button>
+                </div>
+                
+                {/* Notes Section */}
+                <div style={{ flex: '20%', display: 'flex', flexDirection: 'column' , marginLeft: '20px'}}>
+                    <h2 style={{textAlign: 'center' ,color:'darkorange' , fontWeight: 'bold' }}>My Journal</h2>
+                  <textarea
+                    value={trail.notes || ''}
+                    placeholder="Add your notes here..."
+                    onChange={(e) => handleNoteChange(e, trail.id)}
+                    style={{ backgroundColor: '#dbc9a2', width: '400px', height: '400px', marginBottom: '10px', fontFamily: 'Inter, sans-serif', fontSize:'16px', resize:'none', border: '1px solid #ccc', borderRadius: '4px'}}
+                  />
+                  <button onClick={() => { if (trail.notes) saveNotes(trail.id, trail.notes); }} 
+                        onMouseEnter={handleMouseEnterSave}
+                        onMouseLeave={handleMouseLeaveSave}
+                  style={{ 
+                    backgroundColor: isSaveHovered ? '#d1994b' : 'darkorange', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '10px', 
+                    borderRadius: '5px', 
+                    cursor: 'pointer' }}>Save Notes</button>
+                </div>
+    
+              </div>
+            ))}
+          </div>
+          <Snackbar
+            open={openDeleteSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenDeleteSnackbar(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          >
+            <Alert onClose={() => setOpenDeleteSnackbar(false)} severity="success" variant="filled">
+              Trail has been deleted!
+            </Alert>
+          </Snackbar>
+          <Snackbar
+            open={openNoteSavedSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenNoteSavedSnackbar(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          >
+            <Alert onClose={() => setOpenNoteSavedSnackbar(false)} severity="success" variant="filled">
+              Note has been saved!
+            </Alert>
+          </Snackbar>
         </div>
-    );
-}
+      );
+      
+ }      
