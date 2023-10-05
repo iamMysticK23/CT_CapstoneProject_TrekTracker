@@ -237,7 +237,7 @@ export const MyGoogleMap = () => {
     />
     
     {/* Markers for the Trails */}
-    {trails.slice(0, 15).map(trail => (
+    {trails.slice(0, 30).map(trail => (
         <Marker
             key={trail.id}
             position={{ lat: parseFloat(trail.lat), lng: parseFloat(trail.lon) }}
@@ -270,7 +270,7 @@ export const MyGoogleMap = () => {
         }}>
              <h2 style={{textAlign: 'center'}}>Trail Info</h2>
              {trails.length === 0 && <p>No trails available.</p>}
-             {trails.slice(0, 15).map(trail => (
+             {trails.slice(0, 30).map(trail => (
                     <div key={trail.id} style={{ marginBottom: '10px', border: '1px solid white', padding: '5px', borderRadius: '5px' }}>
                     <img src={trail.thumbnail} alt="trail image"  style={{ width: '100%', height: 'auto', maxWidth: '100%' }} />
                     <p><strong>Name:</strong> {trail.name}</p>

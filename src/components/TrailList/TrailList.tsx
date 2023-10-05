@@ -3,7 +3,7 @@ import { NavBar } from '../sharedComponents';
 import { collection, getDocs, deleteDoc, doc, query, where, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import {Button, Snackbar, Alert } from '@mui/material';
-import firebase from "firebase/compat/app"; // Use compat version for v9+
+// import firebase from "firebase/compat/app"; // Use compat version for v9+
 import { getAuth } from 'firebase/auth';
 
 // import "firebase/compat/auth";
