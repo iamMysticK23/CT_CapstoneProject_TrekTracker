@@ -1,4 +1,7 @@
 // Web app Firebase configuration
+import { initializeApp }from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
 export const firebaseConfig = {
     apiKey: "AIzaSyCSBVqrIFxTFanbr8IHp2NxIlteXhHxF_Y",
     authDomain: "trektracker-app.firebaseapp.com",
@@ -7,3 +10,7 @@ export const firebaseConfig = {
     messagingSenderId: "227563687169",
     appId: "1:227563687169:web:8fac4ede27ac1e29c11f00"
   };
+
+const firebaseApp = initializeApp(firebaseConfig)
+
+export const db = getFirestore(firebaseApp)

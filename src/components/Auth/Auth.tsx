@@ -27,14 +27,14 @@ import {
 // internal imports
 import { NavBar } from '../sharedComponents';
 import { InputText, InputPassword } from '../sharedComponents';
-import homepage_image from '../../assets/Images/trektracker_hp.jpeg';
+import homepage_image from '../../assets/Images/bike_auth.jpeg';
 
 
 // styles for sign in/ sign up
 
 const authStyles = {
     main: {
-        backgroundImage: `linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0, 0.5)), url(${homepage_image});`,
+        backgroundImage: `linear-gradient(rgba(0,0,0, 0.2), rgba(0,0,0, 0.3)), url(${homepage_image});`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center top 5px',

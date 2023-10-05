@@ -28,6 +28,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import LoginIcon from '@mui/icons-material/Login';
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import { signOut, getAuth } from 'firebase/auth';
@@ -133,7 +134,7 @@ export const NavBar = () => {
         },
         {
             text: myAuth === 'true' ? 'Discover' : 'Sign In' ,
-            icon: myAuth === 'true' ? <HikingIcon /> : <LoginIcon />, 
+            icon: myAuth === 'true' ? <DirectionsBikeIcon /> : <LoginIcon />, 
             onClick: () => {navigate(myAuth === 'true' ? '/googlemap' : '/auth')},
           
         },
@@ -174,13 +175,15 @@ export const NavBar = () => {
 
 
     const [isDarkMode, setIsDarkMode] = useState(false);
+   
     const toggleDarkMode = () => {
         const body = document.body;
         body.classList.toggle('dark-mode');
         const isCurrentlyEnabled = body.classList.contains('dark-mode');
         localStorage.setItem('dark-mode-enabled', isCurrentlyEnabled.toString());
 
-        setIsDarkMode(isCurrentlyEnabled);
+        setIsDarkMode(prevMode => !prevMode);
+ 
     };
 
     // Check if dark mode is enabled in localStorage
@@ -224,13 +227,18 @@ export const NavBar = () => {
                     </Button>
                     <Button
                         variant ='contained'
-                        color ='info'
                         size = 'small'
-                        sx = {{ marginLeft: '20px'}}
-                        onClick = { toggleDarkMode }
-                    >
-                       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                    </Button>
+                        sx={{
+                            marginLeft: '20px',
+                            backgroundColor: isDarkMode ? '#c48745' : '#3f3f3f', // Change these colors as needed
+                            '&:hover': {
+                              backgroundColor: isDarkMode ? '#3f3f3f' : '#3f3f3f' // Hover colors
+                            }
+                          }}
+                          onClick={toggleDarkMode}
+                        >
+                          {isDarkMode ? 'Go Light Mode' : 'Go Dark Mode'}
+                        </Button>
                 </Stack>
             </AppBar>
             <Drawer

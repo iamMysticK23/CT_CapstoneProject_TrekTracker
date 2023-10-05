@@ -6,7 +6,7 @@ import YouTube from 'react-youtube';
 
 
 // internal imports
-import homepage_image from '../../assets/Images/trektracker_hp.jpeg';
+import homepage_image from '../../assets/Images/mountain_bike.jpg';
 import { NavBar } from '../sharedComponents';
 
 interface Props {
@@ -19,7 +19,7 @@ const Root = styled('div')({
 });
 
 const Main = styled('main')({
-  backgroundImage: `linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0, 0.5)), url(${homepage_image});`,
+  backgroundImage: `linear-gradient(rgba(0,0,0, 0.2), rgba(0,0,0, 0.5)), url(${homepage_image});`,
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center top 5px',

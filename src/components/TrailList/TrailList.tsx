@@ -1,14 +1,109 @@
-import React from 'react';
-
-
-// internal imports
+import React, { useEffect, useState } from 'react';
 import { NavBar } from '../sharedComponents';
+import { collection, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
+import { Snackbar, Alert } from '@mui/material';
+import firebase from "firebase/compat/app"; // Use compat version for v9+
+import { getAuth } from 'firebase/auth';
+
+// import "firebase/compat/auth";
+
+type Trail = {
+    id: string;
+    userID: string;
+    name: string;
+    address: string;
+    city: string;
+    region: string;
+    country: string;
+    length: number;
+    description: string;
+    directions: string;
+    lat: string;
+    lon: string;
+    thumbnail: string;
+    url: string;
+};
 
 export const TrailList = () => {
+    const [trails, setTrails] = useState<Trail[]>([]);
+    const [openDeleteSnackbar, setOpenDeleteSnackbar] = useState(false);
+
+
+    useEffect(() => {
+        const fetchSavedTrails = async () => {
+            const auth = getAuth();
+            const currentUser = auth.currentUser; // Get the currently logged-in user using modular SDK
+        
+            if(!currentUser) return; // Exit if no user is logged in
+        
+            try {
+                const trailsSnapshot = await getDocs(query(collection(db, "trails"), where("userID", "==", currentUser.uid)));
+                const trailsData = trailsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Trail));
+                setTrails(trailsData);
+            } catch (error) {
+                console.error("Error fetching saved trails: ", error);
+            }
+        };
+        
+    
+        fetchSavedTrails();
+    }, []);
+
+    const deleteTrail = async (trailId: string) => {
+        try {
+            const trailRef = doc(db, 'trails', trailId);
+            await deleteDoc(trailRef);
+            setTrails(prevTrails => prevTrails.filter(trail => trail.id !== trailId));
+            console.log("Trail deleted successfully");
+
+            setOpenDeleteSnackbar(true);
+
+        } catch (error) {
+            console.error("Error deleting trail: ", error);
+        }
+    }
+
     return (
         <div>
             <NavBar />
-            <h1 className="headertext">Trail List - some cards with saved trail info</h1>
+            <h1 className="headertext">Trail List</h1>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px'}}>
+            {trails.map(trail => (
+                <div key={trail.id} 
+                style={{
+                    border: '1px solid #ccc', 
+                    padding: '10px', 
+                    borderRadius: '5px',
+                    backgroundColor: '#32453C',
+                    color: 'white'
+                    }}
+                    >
+                        <img src={trail.thumbnail} alt="trail image"  style={{ width: '500px', height: '300px', objectFit: 'cover' }} />
+                        <h2>{trail.name}</h2>
+                        <p><strong>City:</strong> {trail.city}</p>
+                        <p><strong>Region:</strong> {trail.region}</p>
+                        <p><strong>Length:</strong> {trail.length} miles</p>
+                        <br />
+                        <p><strong>Description:</strong> {trail.description} </p>
+                        <br />
+                        <p><strong>Directions</strong> {trail.directions} </p>
+                        <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
+                        <button onClick={() => deleteTrail(trail.id)} style={{marginTop: '10px', backgroundColor: 'red', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Delete</button>
+
+                    </div>
+                ))}
+            </div>
+            <Snackbar 
+    open={openDeleteSnackbar} 
+    autoHideDuration={6000} 
+    onClose={() => setOpenDeleteSnackbar(false)}
+    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+>
+    <Alert onClose={() => setOpenDeleteSnackbar(false)} severity="success" variant="filled">
+        Trail has been deleted!
+    </Alert>
+</Snackbar>
         </div>
-    )
+    );
 }

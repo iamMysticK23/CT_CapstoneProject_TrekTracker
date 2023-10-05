@@ -1,15 +1,24 @@
+
+import { db } from '../../firebaseConfig'
 import React, { useRef, useState, useEffect } from 'react';
 import { GoogleMap, useLoadScript, Marker,  Library } from "@react-google-maps/api";
 import { NavBar } from '../sharedComponents';
+import { collection, addDoc } from 'firebase/firestore';
 import { TrailDetails } from '../TrailDetails';
-import { Button } from '@mui/material'
+import { Button , Snackbar, Alert } from '@mui/material'
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+
+
+
+
 
 
 const libraries: Library[] = ["places"];
 
 const mapContainerStyle = {
-    width: '70vw',
-    height: '83vh',
+    width: '72vw',
+    height: '80vh',
     marginLeft: 'auto',
 };
 
@@ -69,6 +78,7 @@ const fetchTrailData = async (lat: number, lng: number, setTrails: React.Dispatc
     }
 };
 
+// save trail to Google Firestore DB
 
 
 export const MyGoogleMap = () => {
@@ -77,8 +87,42 @@ export const MyGoogleMap = () => {
     const [zoom, setZoom] = useState(10);
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [locationName, setLocationName] = useState<string | null>(null);
-    const [searchText, setSearchText] = useState<string>(''); // Initial location text
+    const [searchText, setSearchText] = useState<string>('San Francisco, CA'); // Initial location text
     const [trails, setTrails] = useState<Trail[]>([]);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+
+    // save trail to Google Firestore DB
+
+    const saveTrailToFirestore = async (trail: Trail) => {
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        console.log("Current User ", currentUser)
+        if (!currentUser) {
+            setSnackbarMessage("Please log in to save a trail.");
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+        }
+    
+        const trailWithUserId = {
+            ...trail,
+            userID: currentUser.uid  // adding the user's ID to the trail data
+        };
+    
+        try {
+            await addDoc(collection(db, 'trails'), trailWithUserId);
+            setSnackbarMessage("Trail saved successfully");
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+        } catch (error) {
+            setSnackbarMessage("Error saving trail: " + error.message);
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+    
 
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4", // Replace with your Google Maps API key
@@ -193,11 +237,15 @@ export const MyGoogleMap = () => {
     />
     
     {/* Markers for the Trails */}
-    {trails.slice(0, 5).map(trail => (
+    {trails.slice(0, 9).map(trail => (
         <Marker
             key={trail.id}
             position={{ lat: parseFloat(trail.lat), lng: parseFloat(trail.lon) }}
-            label={trail.name}
+            label={{ 
+                text: trail.name, 
+                color: 'black',  
+                fontWeight: 'bold'
+            }}
             onClick={() => {
                 // Handle click on trail marker, e.g., display a modal with trail details
             }}
@@ -211,44 +259,70 @@ export const MyGoogleMap = () => {
             position: 'absolute',
             top: '0px',
             bottom: '10px',
-            left: '100px',
+            left: '120px',
             background: 'rgba(91, 140, 86, 0.8)',
             padding: '10px',
             borderRadius: '5px',
             color: '#ffffff',
-            maxWidth: '25%',
-            maxHeight: '70vh',     // setting a maximum height for the container
+            maxWidth: '21vw',
+            maxHeight: '75vh',     // setting a maximum height for the container
             overflowY: 'auto'      // enabling vertical scrolling
         }}>
-             <h2>Trail Info</h2>
+             <h2 style={{textAlign: 'center'}}>Trail Info</h2>
              {trails.length === 0 && <p>No trails available.</p>}
-             {trails.slice(0, 5).map(trail => (
+             {trails.slice(0, 9).map(trail => (
                     <div key={trail.id} style={{ marginBottom: '10px', border: '1px solid white', padding: '5px', borderRadius: '5px' }}>
                     <img src={trail.thumbnail} alt="trail image"  style={{ width: '100%', height: 'auto', maxWidth: '100%' }} />
                     <p><strong>Name:</strong> {trail.name}</p>
-                    <p><strong>Address:</strong> {trail.address}</p>
-                    <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange' }}>{trail.url}</a></p>
+                    <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
                     <p><strong>City:</strong> {trail.city}</p>
                     <p><strong>Region:</strong> {trail.region}</p>
                     <p><strong>Length:</strong> {trail.length} miles</p>
-                    <p><strong>Description:</strong> {trail.description}</p>
-                    <p><strong>Directions:</strong> {trail.directions}</p>
-                        </div>
+                    <br />
+                    <p style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}><strong>Description:</strong> {trail.description}</p>
+                    <Button 
+            sx={{
+                marginTop: '5px',
+                marginLeft: '20px',
+                backgroundColor: 'darkorange',
+                color: 'white',
+                '&:hover': {
+                    backgroundColor: '#3f3f3f',
+                    color: '#5B8C56',
+                },
+            }}
+             onClick={() => saveTrailToFirestore(trail)}
+        >
+            Save Trail
+        </Button>
+        <Snackbar 
+    open={openSnackbar} 
+    autoHideDuration={6000} 
+    onClose={() => setOpenSnackbar(false)}
+>
+    <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} variant="filled">
+        {snackbarMessage}
+    </Alert>
+</Snackbar>
+
+                </div>
             ))}
            
         </div>
+
+        
 
         {/* Weather Info */}
         {weather && (
             <div style={{
               position: 'absolute',
-              bottom: '10px',
-              left: '250px',
+              bottom: '40px',
+              left: '600px',
               background: 'rgba(91, 140, 86, 0.8)',
               padding: '10px',
               borderRadius: '5px',
               color: '#ffffff',
-              maxWidth: '45%',
+              maxWidth: '23vw',
               maxHeight: '55vh',
             }}>
                 <h2>Weather Info</h2>
