@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { NavBar } from '../sharedComponents';
-import { collection, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, where, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { Snackbar, Alert } from '@mui/material';
+import {Button, Snackbar, Alert } from '@mui/material';
 import firebase from "firebase/compat/app"; // Use compat version for v9+
 import { getAuth } from 'firebase/auth';
 
@@ -11,6 +11,7 @@ import { getAuth } from 'firebase/auth';
 type Trail = {
     id: string;
     userID: string;
+    notes?: string;
     name: string;
     address: string;
     city: string;
@@ -28,6 +29,8 @@ type Trail = {
 export const TrailList = () => {
     const [trails, setTrails] = useState<Trail[]>([]);
     const [openDeleteSnackbar, setOpenDeleteSnackbar] = useState(false);
+    const [openNoteSavedSnackbar, setOpenNoteSavedSnackbar] = useState(false);
+
 
 
     useEffect(() => {
@@ -64,6 +67,24 @@ export const TrailList = () => {
         }
     }
 
+    const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>, trailId: string) => {
+        const updatedNote = e.target.value;
+        setTrails(prevTrails => prevTrails.map(trail => trail.id === trailId ? {...trail, notes: updatedNote} : trail));
+    }
+    
+    const saveNotes = async (trailId: string, notes: string) => {
+        try {
+            const trailRef = doc(db, 'trails', trailId);
+            await updateDoc(trailRef, { notes });
+            console.log("Notes saved successfully");
+            setOpenNoteSavedSnackbar(true);  // Set the snackbar state to true here
+        } catch (error) {
+            console.error("Error saving notes: ", error);
+        }
+    }
+    
+    
+
     return (
         <div>
             <NavBar />
@@ -78,9 +99,11 @@ export const TrailList = () => {
                     backgroundColor: '#32453C',
                     color: 'white'
                     }}
+                    
                     >
-                        <img src={trail.thumbnail} alt="trail image"  style={{ width: '500px', height: '300px', objectFit: 'cover' }} />
+                        <img src={trail.thumbnail} alt="trail image"  style={{  display: 'block', margin: '0 auto', width: '500px', height: '300px', objectFit: 'cover' }} />
                         <h2>{trail.name}</h2>
+                        <br />
                         <p><strong>City:</strong> {trail.city}</p>
                         <p><strong>Region:</strong> {trail.region}</p>
                         <p><strong>Length:</strong> {trail.length} miles</p>
@@ -89,14 +112,23 @@ export const TrailList = () => {
                         <br />
                         <p><strong>Directions</strong> {trail.directions} </p>
                         <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
-                        <button onClick={() => deleteTrail(trail.id)} style={{marginTop: '10px', backgroundColor: 'red', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Delete</button>
+                        <Button onClick={() => deleteTrail(trail.id)} style={{marginTop: '10px', backgroundColor: 'darkred', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Delete</Button>
+                        <textarea 
+                        value={trail.notes || ''}
+                        placeholder="Add your notes here..."
+                        onChange={(e) => handleNoteChange(e, trail.id)}
+                        style={{ width: '100%', height: '100px', marginTop: '10px' }}
+                    />
+                    <button onClick={() => { if (trail.notes) saveNotes(trail.id, trail.notes); }} style={{marginTop: '10px', backgroundColor: 'darkorange', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Save Notes</button>
 
                     </div>
                 ))}
+
+
             </div>
             <Snackbar 
     open={openDeleteSnackbar} 
-    autoHideDuration={6000} 
+    autoHideDuration={3000} 
     onClose={() => setOpenDeleteSnackbar(false)}
     anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 >
@@ -104,6 +136,17 @@ export const TrailList = () => {
         Trail has been deleted!
     </Alert>
 </Snackbar>
+<Snackbar 
+    open={openNoteSavedSnackbar} 
+    autoHideDuration={3000} 
+    onClose={() => setOpenNoteSavedSnackbar(false)}
+    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+>
+    <Alert onClose={() => setOpenNoteSavedSnackbar(false)} severity="success" variant="filled">
+        Note has been saved!
+    </Alert>
+</Snackbar>
+
         </div>
     );
 }
