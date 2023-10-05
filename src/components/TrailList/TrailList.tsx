@@ -13,7 +13,6 @@ type Trail = {
     userID: string;
     notes?: string;
     name: string;
-    address: string;
     city: string;
     region: string;
     country: string;
