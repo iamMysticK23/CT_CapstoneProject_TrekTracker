@@ -15,11 +15,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const libraries: Library[] = ["places"];
 
-const mapContainerStyle = {
-    width: '72vw',
-    height: '80vh',
-    marginLeft: 'auto',
-};
+
 
 // weather data
 type WeatherData = {
@@ -38,6 +34,7 @@ type Trail = {
     address: string;
     city: string;
     region: string;
+    rating: string;
     country: string;
     length: number;
     description: string;
@@ -209,143 +206,205 @@ export const MyGoogleMap = () => {
   if (loadError) return "Error loading Google Maps";
   if (!isLoaded) return "Loading Google Maps";
 
-
   return (
     <div>
         <NavBar />
-        <h1 className="headertext">Google Map</h1>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: "10px" }}>
-            <input
-                type="text"
-                placeholder="Enter a location"
-                style={{ width: "300px", padding: "10px" }}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-            />
-        <Button 
-            sx={{
-                marginTop: '5px',
-                marginLeft: '20px',
-                backgroundColor: '#5B8C56',
-                color: 'white',
-                '&:hover': {
-                    backgroundColor: 'darkgreen',
-                    color: '#5B8C56',
-                },
-            }}
-            onClick={onSearchButtonClick}
-        >
-            Search
-        </Button>
-        </div>
-        <div style={{ position: 'relative' }}>
-        <GoogleMap
-    id="map"
-    mapContainerStyle={mapContainerStyle}
-    zoom={zoom}
-    center={center}
->
-    <Marker
-        position={{ lat: center.lat, lng: center.lng }}
-    />
-    
-    {/* Markers for the Trails */}
-    {trails.slice(0, 30).map(trail => (
-        <Marker
-            key={trail.id}
-            position={{ lat: parseFloat(trail.lat), lng: parseFloat(trail.lon) }}
-            label={{ 
-                text: trail.name, 
-                color: 'black',  
-                fontWeight: 'bold'
-            }}
-            onClick={() => {
-                // Handle click on trail marker, e.g., display a modal with trail details
-            }}
-        />
-    ))}
-</GoogleMap>
-
-
-        {/* Trail Info */}
-        <div style={{
-            position: 'absolute',
-            top: '0px',
-            bottom: '10px',
-            left: '120px',
-            background: 'rgba(91, 140, 86, 0.8)',
-            padding: '10px',
-            borderRadius: '5px',
-            color: '#ffffff',
-            maxWidth: '21vw',
-            maxHeight: '75vh',     // setting a maximum height for the container
-            overflowY: 'auto'      // enabling vertical scrolling
-        }}>
-             <h2 style={{textAlign: 'center'}}>Trail Info</h2>
-             {trails.length === 0 && <p>No trails available.</p>}
-             {trails.slice(0, 30).map(trail => (
-                    <div key={trail.id} style={{ marginBottom: '10px', border: '1px solid white', padding: '5px', borderRadius: '5px' }}>
-                    <img src={trail.thumbnail} alt="trail image"  style={{ width: '100%', height: 'auto', maxWidth: '100%' }} />
-                    <p><strong>Name:</strong> {trail.name}</p>
-                    <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
-                    <p><strong>City:</strong> {trail.city}</p>
-                    <p><strong>Region:</strong> {trail.region}</p>
-                    <p><strong>Length:</strong> {trail.length} miles</p>
-                    <br />
-                    <p style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}><strong>Description:</strong> {trail.description}</p>
-                    <Button 
-            sx={{
-                marginTop: '5px',
-                marginLeft: '20px',
-                backgroundColor: 'darkorange',
-                color: 'white',
-                '&:hover': {
-                    backgroundColor: '#3f3f3f',
-                    color: '#5B8C56',
-                },
-            }}
-             onClick={() => saveTrailToFirestore(trail)}
-        >
-            Save Trail
-        </Button>
-        <Snackbar 
-    open={openSnackbar} 
-    autoHideDuration={6000} 
-    onClose={() => setOpenSnackbar(false)}
->
-    <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} variant="filled">
-        {snackbarMessage}
-    </Alert>
-</Snackbar>
-
-                </div>
-            ))}
-           
-        </div>
-
+        <h1 className="headertext">Discover Trails</h1>
         
-
-        {/* Weather Info */}
-        {weather && (
-            <div style={{
-              position: 'absolute',
-              bottom: '40px',
-              left: '600px',
-              background: 'rgba(91, 140, 86, 0.8)',
-              padding: '10px',
-              borderRadius: '5px',
-              color: '#ffffff',
-              maxWidth: '23vw',
-              maxHeight: '55vh',
-            }}>
-                <h2>Weather Info</h2>
-                <p>Location: {locationName}</p>
-                <p>Temperature: {weather.main.temp}°F</p>
-                <p>Weather: {weather.weather[0].description}</p>
-            </div>
+        <div style={{ position: 'relative', height: '86vh', width: '95%', marginLeft: 'auto' }}> {/* Adjusted size for the Google Map container */}
             
-        )}
+            <div style={{ 
+                position: 'absolute', 
+                top: '10px', 
+                left: '50%', 
+                transform: 'translateX(-50%)',
+                zIndex: 1,
+                display: 'flex', 
+                alignItems: 'center' 
+            }}>
+                <input
+                    type="text"
+                    placeholder="Enter a location"
+                    style={{ width: "300px", padding: "10px" }}
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                />
+                <Button 
+                    sx={{
+                        marginTop: '5px',
+                        marginLeft: '20px',
+                        backgroundColor: '#5B8C56',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: 'darkgreen',
+                            color: '#5B8C56',
+                        },
+                    }}
+                    onClick={onSearchButtonClick}
+                >
+                    Search
+                </Button>
+            </div>
 
+            <GoogleMap
+                id="map"
+                mapContainerStyle={{ height: '100%', width: '100%' }}  
+                zoom={zoom}
+                center={center}
+            >
+                <Marker
+                    position={{ lat: center.lat, lng: center.lng }}
+                />
+                
+                {/* Markers for the Trails remain untouched */}
+                {trails.slice(0, 30).map(trail => (
+                    <Marker
+                        key={trail.id}
+                        position={{ lat: parseFloat(trail.lat), lng: parseFloat(trail.lon) }}
+                        label={{ 
+                            text: trail.name, 
+                            color: 'black',  
+                            fontWeight: 'bold'
+                        }}
+                        onClick={() => {
+                            // Handle click on trail marker, e.g., display a modal with trail details
+                        }}
+                    />
+                ))}
+            </GoogleMap>
+
+            {/* Trail Info */}
+            <div style={{
+                position: 'absolute',
+                top: '60px',
+                bottom: '30px',
+                left: '30px',
+                background: 'rgba(50, 69, 60, 0.9)',
+                padding: '10px',
+                borderRadius: '5px',
+                color: '#ffffff',
+                maxWidth: '30vw',
+                maxHeight: '85vh',
+                overflowY: 'auto'
+            }}>
+                <h2 style={{ textAlign: 'center' }}>Trail Info</h2>
+                {trails.length === 0 && <p>No trails available.</p>}
+                {trails.slice(0, 30).map(trail => (
+                    <div key={trail.id} style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        marginBottom: '15px',
+                        border: '1px solid black',
+                        padding: '10px',
+                        borderRadius: '5px',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}>
+                        {/* Image */}
+                        <img
+                            src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'}
+                            alt="trail image"
+                            style={{
+                                height: '150px',
+                                width: '150px',
+                                marginRight: '15px',
+                                borderRadius: '5px',
+                            }}
+                            onError={(e) => {
+                                const imgElement = e.target as HTMLImageElement;
+                                const defaultImageUrl = 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'; // Replace with your default image URL
+                        
+                                // Check if the image source is the default URL (i.e., it has already been replaced once)
+                                if (imgElement.src !== defaultImageUrl) {
+                                    imgElement.src = defaultImageUrl;
+                                } else {
+                                    // Handle the case where the image couldn't be loaded even with the default URL
+                                    // You can add additional fallbacks or error handling here
+                                    console.error(`Error loading image for trail: ${trail.name}`);
+                                }
+                            }}
+                        />
+                        {/* Trail Details */}
+                        <div style={{ flex: 1, marginRight: '15px', display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ marginBottom: '5px', color: '#c4893f', textAlign: 'left' }}>{trail.name}</h3>
+                            <p style={{ marginBottom: '2px' }}><strong>City:</strong> {trail.city}</p>
+                            <p style={{ marginBottom: '2px' }}><strong>Region:</strong> {trail.region}</p>
+                            <p style={{ marginBottom: '2px' }}><strong>Length:</strong> {trail.length} miles</p>
+                            <p style={{ marginBottom: '2px' }}><strong>Rating:</strong> {trail.rating}</p>
+                            <div style={{ flex: 1, maxHeight: '150px', overflow: 'hidden' }}>
+                                <p style={{
+                                    marginBottom: '2px',
+                                    overflow: 'hidden', /* Hide overflowing content */
+                                    textOverflow: 'ellipsis', /* Show ellipsis for truncated text */
+                                    whiteSpace: 'pre-line', /* Allow word wrap */
+                                    overflowWrap: 'break-word',
+                                    wordBreak: 'break-all',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 4,
+                                    WebkitBoxOrient: 'vertical',
+                                    width: '100%',
+                                }}>
+                                    <strong>Description:</strong> {trail.description}
+                                </p>
+                            </div>
+                            {/* Save Trail Button */}
+                            <Button
+                                sx={{
+                                    backgroundColor: 'darkorange',
+                                    color: 'white',
+                                    '&:hover': {
+                                        backgroundColor: '#3f3f3f',
+                                        color: '#5B8C56',
+                                    },
+                                }}
+                                onClick={() => saveTrailToFirestore(trail)}
+                            >
+                                Save Trail
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+                <Snackbar 
+                    open={openSnackbar} 
+                    autoHideDuration={6000} 
+                    onClose={() => setOpenSnackbar(false)}
+                >
+                    <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} variant="filled">
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+            </div>
+            {/* Weather Info */}
+            {weather && (
+                <div style={{
+                    position: 'absolute',
+                    bottom: '40px',
+                    right: '80px',
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.9), rgba(128,128,128,0.9))', // Black to grey gradient
+                    padding: '10px',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    maxWidth: '15vw', // Reduced the width
+                    maxHeight: '35vh', // Reduced the height
+                    boxShadow: '0px 3px 10px rgba(0,0,0,0.2)',
+                    transition: 'all 0.2s ease-in-out',
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <h2 style={{
+                        fontSize: '10px', // Reduced the font size
+                        borderBottom: '1px solid white', 
+                        paddingBottom: '5px', 
+                        marginBottom: '10px',
+                        textAlign: 'center'
+                    }}>CURRENT WEATHER DETAILS</h2>
+                    <p style={{ fontSize: '12px' }}><strong>LOCATION:</strong> {locationName}</p>
+                    <p style={{ fontSize: '14px', color: 'darkorange' }}><strong>TEMPERATURE:</strong> <strong>{weather.main.temp}°F</strong></p>
+                    <p style={{ fontSize: '14px', color: '#c8e3d0' }}><strong>WEATHER: {weather.weather[0].description.toUpperCase()}</strong></p>
+                </div>
+            )}
         </div>
     </div>
-  )}
+  );
+};

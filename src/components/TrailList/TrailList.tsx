@@ -15,6 +15,7 @@ type Trail = {
     name: string;
     city: string;
     region: string;
+    rating: string;
     country: string;
     length: number;
     description: string;
@@ -100,17 +101,27 @@ export const TrailList = () => {
                     }}
                     
                     >
-                        <img src={trail.thumbnail} alt="trail image"  style={{  display: 'block', margin: '0 auto', width: '500px', height: '300px', objectFit: 'cover' }} />
+                        <img src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'} 
+                        alt="trail image" 
+                         style={{  
+                            display: 'block', 
+                            margin: '0 auto', 
+                            width: '500px',
+                            height: '300px', 
+                            objectFit: 'cover' 
+                            }} 
+                            />
                         <h2>{trail.name}</h2>
                         <br />
                         <p><strong>City:</strong> {trail.city}</p>
                         <p><strong>Region:</strong> {trail.region}</p>
                         <p><strong>Length:</strong> {trail.length} miles</p>
+                        <p><strong>Rating:</strong> {trail.rating} </p>
                         <br />
                         <p><strong>Description:</strong> {trail.description} </p>
                         <br />
-                        <p><strong>Directions</strong> {trail.directions} </p>
-                        <p><strong>URL</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
+                        <p><strong>Directions:</strong> {trail.directions} </p>
+                        <p><strong>URL:</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word'}}>{trail.url}</a></p>
                         <Button onClick={() => deleteTrail(trail.id)} style={{marginTop: '10px', backgroundColor: 'darkred', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer'}}>Delete</Button>
                         <textarea 
                         value={trail.notes || ''}
