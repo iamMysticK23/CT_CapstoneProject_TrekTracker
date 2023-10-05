@@ -1,4 +1,3 @@
-
 import { db } from '../../firebaseConfig'
 import React, { useRef, useState, useEffect } from 'react';
 import { GoogleMap, useLoadScript, Marker,  Library } from "@react-google-maps/api";

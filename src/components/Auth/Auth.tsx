@@ -10,6 +10,9 @@ import {
     signInWithEmailAndPassword, 
     Auth} from 'firebase/auth';
 
+import { setDoc, doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
+
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -96,6 +99,7 @@ const GoogleButton = (_props: ButtonProps) => {
         onAuthStateChanged(auth, (user) => {
 
             if (user) {
+                createUserProfile(user); 
                 localStorage.setItem('user', user.email || '')
                 localStorage.setItem('token', user.uid || '')
                 setMessage(`User: ${user.email} logged in.`)
@@ -161,10 +165,11 @@ const SignInUser = () => {
             localStorage.setItem('auth', 'true')
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    localStorage.setItem('token', user.uid || '')
-                    localStorage.setItem('user', user.email || '')
+                    createUserProfile(user);  // Add this line here
+                    localStorage.setItem('token', user.uid || '');
+                    localStorage.setItem('user', user.email || '');
                 }
-            })
+            });
             const user = userCredential.user
             setMessage(`User: ${user.email} logged in.`)
             setMessageType('success')
@@ -208,6 +213,25 @@ const SignInUser = () => {
 
 }
 
+// create profile 
+const createUserProfile = async (user) => {
+    const userRef = doc(db, 'users', user.uid);
+    
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+        const { uid, email, displayName } = user;
+        const createdAt = new Date();
+
+        await setDoc(userRef, {
+            uid,
+            email,
+            displayName,
+            createdAt,
+            // ... any other default data you want to set
+        });
+    }
+};
+
 // sign in user
 const RegisterUser = () => {
 
@@ -226,12 +250,13 @@ const RegisterUser = () => {
             localStorage.setItem('auth', 'true')
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    localStorage.setItem('token', user.uid || '')
-                    localStorage.setItem('user', user.email || '')
+                    createUserProfile(user);  // Add this line here
+                    localStorage.setItem('token', user.uid || '');
+                    localStorage.setItem('user', user.email || '');
                 }
-            })
+            });
             const user = userCredential.user
-            setMessage(`User: ${user.email} logged in.`)
+            setMessage(`User: ${user.email} created and logged in.`)
             setMessageType('success')
             setOpen(true)
             setTimeout(() => {navigate('/googlemap')}, 2000)

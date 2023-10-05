@@ -237,7 +237,7 @@ export const NavBar = () => {
                           }}
                           onClick={toggleDarkMode}
                         >
-                          {isDarkMode ? 'Go Dark Mode' : 'Go Light Mode'}
+                          {isDarkMode ? 'Light/Dark Mode' : 'Light/Dark Mode'}
                         </Button>
                 </Stack>
             </AppBar>
