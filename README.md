@@ -24,3 +24,4 @@ Things I'd like to change/work on:
 - Not having everyone delete pics lol
 - Better functionality of the google map
 
+link to functioning app: https://trektracker-app.web.app/
