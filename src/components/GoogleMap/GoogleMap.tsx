@@ -14,7 +14,7 @@ import { NavBar } from '../sharedComponents';
 
 // need this to load the Google Map
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const libraries = ["places"];
+// const libraries = ["places"];
 
 
 // weather data
