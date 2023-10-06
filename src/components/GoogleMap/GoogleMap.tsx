@@ -282,15 +282,15 @@ export const MyGoogleMap = () => {
             {/* Display Trail Info */}
             <div style={{
                 position: 'absolute',
-                top: '60px',
+                top: '90px',
                 bottom: '30px',
-                left: '30px',
+                left: '50px',
                 background: 'rgba(50, 69, 60, 0.9)',
                 padding: '10px',
                 borderRadius: '5px',
                 color: '#ffffff',
                 maxWidth: '30vw',
-                maxHeight: '85vh',
+                maxHeight: '73vh',
                 overflowY: 'auto'
             }}>
             <h2 style={{ textAlign: 'center' }}>Trail Info</h2>
