@@ -182,8 +182,11 @@ export const TrailList = () => {
                   <p><strong>Region:</strong> {trail.region}</p>
                   <p><strong>Length:</strong> {trail.length} miles</p>
                   <p><strong>Rating:</strong> {trail.rating} </p>
+                  <br />
                   <p><strong>Description:</strong> {trail.description} </p>
+                  <br />
                   <p><strong>Directions:</strong> {trail.directions} </p>
+                  <br />
                   <p><strong>URL:</strong> <a href={trail.url} target="_blank" rel="noopener noreferrer" style={{ color: 'orange', wordWrap: 'break-word' }}>{trail.url}</a></p>
 
 
