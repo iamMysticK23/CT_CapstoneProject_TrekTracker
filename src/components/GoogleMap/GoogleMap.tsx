@@ -273,7 +273,7 @@ export const MyGoogleMap = () => {
                             fontWeight: 'bold'
                         }}
                         onClick={() => {
-                            // Handle click on trail marker, e.g., display a modal with trail details
+                            
                         }}
                     />
                 ))}
@@ -407,8 +407,8 @@ export const MyGoogleMap = () => {
                     padding: '10px',
                     borderRadius: '8px',
                     color: '#ffffff',
-                    maxWidth: '15vw', // Reduced the width
-                    maxHeight: '35vh', // Reduced the height
+                    maxWidth: '15vw', 
+                    maxHeight: '35vh', 
                     boxShadow: '0px 3px 10px rgba(0,0,0,0.2)',
                     transition: 'all 0.2s ease-in-out',
                 }}
