@@ -184,7 +184,8 @@ export const TrailList = () => {
                   <p><strong>Rating:</strong> {trail.rating} </p>
                   <p><strong>Description:</strong> {trail.description} </p>
                   <p><strong>Directions:</strong> {trail.directions} </p>
-                  <p><strong>URL:</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word' }}>{trail.url}</a></p>
+                  <p><strong>URL:</strong> <a href={trail.url} target="_blank" rel="noopener noreferrer" style={{ color: 'orange', wordWrap: 'break-word' }}>{trail.url}</a></p>
+
 
                   <Button onClick={() => deleteTrail(trail.id)} 
                           onMouseEnter={handleMouseEnterDelete}
