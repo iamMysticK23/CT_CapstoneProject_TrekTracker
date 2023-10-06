@@ -48,19 +48,19 @@ const VideoContainer = styled('div')({
   left: '105px',
   width: '100%',
   height: 'calc(100% - 40px)',
-  opacity: '0.5'
+  opacity: '0.8'
 });
 
 
 
 // implement youtube video for front page
-const videoId = '1gr0icgvFkM';
+const videoId = '12N6UmhCqtE';
 
 // youtube player options
 const opts = {
   padding: '5px',
-  width: '750vw',
-  height: '400vh',
+  width: '850vw',
+  height: '500vh',
   playerVars: {
     autoplay: 1,
     mute: 1,

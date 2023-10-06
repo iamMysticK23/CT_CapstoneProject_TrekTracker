@@ -138,9 +138,9 @@ export const NavBar = () => {
            
         },
         {
-            text: myAuth === 'true' ? 'My Profile' : '',
+            text: myAuth === 'true' ? 'Gallery' : '',
             icon: myAuth === 'true' ? <AccountCircleIcon /> : '',
-            onClick: myAuth === 'true' ? () => {navigate('/profile')} : () => {},
+            onClick: myAuth === 'true' ? () => {navigate('/gallery')} : () => {},
            
         },
     ]

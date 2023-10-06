@@ -137,6 +137,7 @@ export const TrailList = () => {
                     cursor: 'pointer',
                     flex: '70%',
                     marginRight: '10px',
+                    marginBottom: '40px',
                     height: '500px',
                     overflow: 'auto'
                   }}

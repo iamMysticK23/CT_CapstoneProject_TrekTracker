@@ -12,7 +12,7 @@ import {
         MyGoogleMap, 
         Home, 
         TrailList, 
-        UserProfile } from './components';
+        ImageGallery } from './components';
 import { theme } from './Theme/themes';
 import { firebaseConfig } from './firebaseConfig';
 import './index.css';
@@ -29,7 +29,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/admin' element= {<AdminPage/>} />
             <Route path='/googlemap' element= {<MyGoogleMap/>} />
             <Route path='/traillist' element= {<TrailList/>} />
-            <Route path='/profile' element= {<UserProfile/>} />
+            <Route path='/gallery' element= {<ImageGallery/>} />
           </Routes>
         </Router>
     </ThemeProvider>
