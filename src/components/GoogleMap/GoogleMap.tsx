@@ -1,7 +1,7 @@
 // external imports
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebaseConfig'
-import { GoogleMap, useLoadScript, Marker, } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { Button , Snackbar, Alert } from '@mui/material'
 import { getAuth } from 'firebase/auth';
@@ -13,7 +13,8 @@ import { NavBar } from '../sharedComponents';
 
 
 // need this to load the Google Map
-const libraries: Library[] = ["places"];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const libraries = ["places"];
 
 
 // weather data
@@ -134,7 +135,8 @@ export const MyGoogleMap = () => {
     // Default structure to load Google Maps
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4", 
-        libraries,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        libraries: ["places"] as any,
     });
 
     // Fetch weather data with latitude/longitude using OpenWeatherMap API
