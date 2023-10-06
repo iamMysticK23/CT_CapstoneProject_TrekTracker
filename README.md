@@ -6,7 +6,7 @@ My ultimate goal was to combine a little bit of everything I’ve learned into o
 
 Front end: React with Typescript (and I guess node.js). I picked React because it was the freshest in memory and seemed to be the most dynamic.
 
-Back end: Google Firebase, Firestore database and Storage for image upload
+Back end: Google Authentication, Firestore database and Storage for image upload
 
 The back end has two tables - users and trails. The trails get saved via a user id. The user can only save a specific trail once but many users can save the same trails.
 Everyone who is registered can upload pictures to the universal gallery. I originally wanted this to be a user profile but it did not work out the way I wanted so
@@ -23,5 +23,6 @@ Things I'd like to change/work on:
 - User profile
 - Not having everyone delete pics lol
 - Better functionality of the google map
+- Make the overall build more mobile responsive
 
 link to functioning app: https://trektracker-app.web.app/
