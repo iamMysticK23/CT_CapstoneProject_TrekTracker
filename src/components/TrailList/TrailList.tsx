@@ -1,13 +1,12 @@
+// external imports
+
 import React, { useEffect, useState } from 'react';
 import { NavBar } from '../sharedComponents';
 import { collection, getDocs, deleteDoc, doc, query, where, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import {Button, Snackbar, Alert } from '@mui/material';
-// import firebase from "firebase/compat/app"; // Use compat version for v9+
 import { getAuth } from 'firebase/auth';
-import { textAlign } from '@mui/system';
 
-// import "firebase/compat/auth";
 
 // internal imports
 import trailList_image from '../../assets/Images/trail_list.jpeg';
@@ -30,19 +29,25 @@ type Trail = {
     url: string;
 };
 
+// Display the saved trails 
 export const TrailList = () => {
     const [trails, setTrails] = useState<Trail[]>([]);
     const [openDeleteSnackbar, setOpenDeleteSnackbar] = useState(false);
     const [openNoteSavedSnackbar, setOpenNoteSavedSnackbar] = useState(false);
 
 
+  // Display the saved trails of the current user
+
+  // i used the name "useEffect" throughout this project because I was using tutorials and this
+  // was the easiest way for me to remember it.
+
 
     useEffect(() => {
         const fetchSavedTrails = async () => {
             const auth = getAuth();
-            const currentUser = auth.currentUser; // Get the currently logged-in user using modular SDK
+            const currentUser = auth.currentUser; 
         
-            if(!currentUser) return; // Exit if no user is logged in
+            if(!currentUser) return; 
         
             try {
                 const trailsSnapshot = await getDocs(query(collection(db, "trails"), where("userID", "==", currentUser.uid)));
@@ -57,6 +62,7 @@ export const TrailList = () => {
         fetchSavedTrails();
     }, []);
 
+    // User can delete a trail
     const deleteTrail = async (trailId: string) => {
         try {
             const trailRef = doc(db, 'trails', trailId);
@@ -71,11 +77,13 @@ export const TrailList = () => {
         }
     }
 
+    // user can edit a note/journal entry
     const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>, trailId: string) => {
         const updatedNote = e.target.value;
         setTrails(prevTrails => prevTrails.map(trail => trail.id === trailId ? {...trail, notes: updatedNote} : trail));
     }
     
+    // user can save their note to the database via their userID/trailID
     const saveNotes = async (trailId: string, notes: string) => {
         try {
             const trailRef = doc(db, 'trails', trailId);
@@ -86,7 +94,8 @@ export const TrailList = () => {
             console.error("Error saving notes: ", error);
         }
     }
-// change color when delete button is hovered over
+
+    // Styling for the delete button and save button 
     const [isDeleteHovered, setIsDeleteHovered] = useState(false);
 
     const handleMouseEnterDelete = () => {
@@ -115,18 +124,32 @@ export const TrailList = () => {
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundAttachment:'fixed',
-            minHeight: '100vh',  // Adjust based on your preference
+            minHeight: '100vh',  
             width: '100%',
-            overflow: 'auto'    // Adjust based on your preference
+            overflow: 'auto'    
         }}>
           <NavBar />
           <h1 className="headertext" style={{color:'#915c33' , fontWeight: 'bold'}}>My Saved Trail List</h1>
-          <p style = {{textAlign: 'center' , color: 'white', fontWeight: 'bold'}}>The information cards are scrollable.</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', height: '100vh', width: '100vw', padding: '20px', marginLeft: '70px'}}>
+          <p style = {{
+              textAlign: 'center', 
+              color: 'white', 
+              fontWeight: 'bold'
+              }}>The information cards are scrollable.</p>
+          <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: '20px', 
+              justifyContent: 'center', 
+              height: '100vh', 
+              width: '100vw', 
+              padding: '20px',
+              marginLeft: '70px'}}
+              >
+
             {trails.map(trail => (
               <div key={trail.id} style={{ width: 'calc(80% - 10px)', display: 'flex', flexDirection: 'row', margin: '20px' }}>
                 
-                {/* Trail Card */}
+                {/* Trail Cards */}
                 <div
                   style={{
                     border: '1px solid #ccc',
@@ -162,6 +185,7 @@ export const TrailList = () => {
                   <p><strong>Description:</strong> {trail.description} </p>
                   <p><strong>Directions:</strong> {trail.directions} </p>
                   <p><strong>URL:</strong> <a href={trail.url} style={{ color: 'orange', wordWrap: 'break-word' }}>{trail.url}</a></p>
+
                   <Button onClick={() => deleteTrail(trail.id)} 
                           onMouseEnter={handleMouseEnterDelete}
                           onMouseLeave={handleMouseLeaveDelete}
@@ -177,14 +201,38 @@ export const TrailList = () => {
                 </div>
                 
                 {/* Notes Section */}
-                <div style={{ flex: '20%', display: 'flex', flexDirection: 'column' , marginLeft: '20px'}}>
-                    <h2 style={{textAlign: 'center' ,color:'darkorange' , fontWeight: 'bold' }}>My Journal</h2>
+                <div style={{ 
+                  flex: '20%', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  marginLeft: '20px'}}
+                  >
+                    <h2 style={{
+                      textAlign: 'center',
+                      color:'darkorange', 
+                      fontWeight: 'bold' 
+                      }}
+                      >
+                        My Journal
+                      </h2>
+
                   <textarea
                     value={trail.notes || ''}
                     placeholder="Add your notes here..."
                     onChange={(e) => handleNoteChange(e, trail.id)}
-                    style={{ backgroundColor: '#dbc9a2', width: '400px', height: '400px', marginBottom: '10px', fontFamily: 'Inter, sans-serif', fontSize:'16px', resize:'none', border: '1px solid #ccc', borderRadius: '4px'}}
+                    style={{ 
+                      backgroundColor: '#dbc9a2', 
+                      width: '400px', 
+                      height: '400px',
+                      marginBottom: '10px', 
+                      fontFamily: 'Inter, sans-serif', 
+                      fontSize:'16px', 
+                      resize:'none',
+                       border: '1px solid #ccc',
+                       borderRadius: '4px'
+                      }}
                   />
+
                   <button onClick={() => { if (trail.notes) saveNotes(trail.id, trail.notes); }} 
                         onMouseEnter={handleMouseEnterSave}
                         onMouseLeave={handleMouseLeaveSave}
@@ -196,10 +244,10 @@ export const TrailList = () => {
                     borderRadius: '5px', 
                     cursor: 'pointer' }}>Save Notes</button>
                 </div>
-    
               </div>
             ))}
           </div>
+
           <Snackbar
             open={openDeleteSnackbar}
             autoHideDuration={3000}
@@ -221,6 +269,5 @@ export const TrailList = () => {
             </Alert>
           </Snackbar>
         </div>
-      );
-      
+     ); 
  }      

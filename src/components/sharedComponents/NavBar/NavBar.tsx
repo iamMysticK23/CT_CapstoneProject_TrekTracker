@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+// external imports
+
+import _React, { useState, useEffect } from 'react';
 import {
     Button,
     Drawer,
@@ -13,7 +15,6 @@ import {
     Divider,
     CssBaseline,
     Box,
-
 } from '@mui/material';
 
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -100,7 +101,6 @@ const navStyles = {
 
 
 // NavBar component 
-
 export const NavBar = () => {
 
     const navigate = useNavigate();
@@ -179,7 +179,7 @@ export const NavBar = () => {
  
     };
 
-    // Check if dark mode is enabled in localStorage
+    // Dark mode/ light mode
     useEffect(() => {
         const isDarkModeEnabled = localStorage.getItem('dark-mode-enabled');
         if (isDarkModeEnabled === 'true') {
@@ -247,26 +247,26 @@ export const NavBar = () => {
                 </Box>
                 <Divider />
                 <List>
-{ 
-                      navLinks.map((item) =>  {
-                            const { text, icon, onClick } = item;
-                            return (
-                                <ListItemButton 
-                                key={text} 
-                                onClick={onClick}
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '8px',
-                                }}
-                                >
-                                    { icon }
-                                    <ListItemText primary={text} sx={{ fontSize: '0.3rem'}} />
-                                </ListItemButton>
-                            )
-                        })
-                    }
+                { 
+                navLinks.map((item) =>  {
+                    const { text, icon, onClick } = item;
+                    return (
+                        <ListItemButton 
+                        key={text} 
+                        onClick={onClick}
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            padding: '8px',
+                        }}
+                        >
+                            { icon }
+                            <ListItemText primary={text} sx={{ fontSize: '0.3rem'}} />
+                        </ListItemButton>
+                    )
+                })
+            }
                 </List>
             </Drawer>
         </Box>

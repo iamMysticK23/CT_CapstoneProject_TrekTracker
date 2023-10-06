@@ -1,20 +1,19 @@
+// external imports
+import React, { useState, useEffect } from 'react';
 import { db } from '../../firebaseConfig'
-import React, { useRef, useState, useEffect } from 'react';
-import { GoogleMap, useLoadScript, Marker,  Library } from "@react-google-maps/api";
-import { NavBar } from '../sharedComponents';
+import { GoogleMap, useLoadScript, Marker, } from "@react-google-maps/api";
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-
 import { Button , Snackbar, Alert } from '@mui/material'
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
+
+
+// internal imports
+import { NavBar } from '../sharedComponents';
 
 
 
-
-
-
-
+// need this to load the Google Map
 const libraries: Library[] = ["places"];
-
 
 
 // weather data
@@ -26,6 +25,7 @@ type WeatherData = {
         description: string;
     }[];
 };
+
 
 // trail data
 type Trail = {
@@ -45,10 +45,8 @@ type Trail = {
     url: string;
 };
 
-// Update the component's state
 
-
-// Fetch trail data based on the given coordinates (lat, lng)
+// Fetch trail data from TrailAPI based on the given coordinates 
 const fetchTrailData = async (lat: number, lng: number, setTrails: React.Dispatch<React.SetStateAction<Trail[]>>) => {
 
     const apiKey = '9355ca4dffmshc8cdab31b941a31p14159djsna664b84460b4'; 
@@ -74,23 +72,21 @@ const fetchTrailData = async (lat: number, lng: number, setTrails: React.Dispatc
     }
 };
 
-// save trail to Google Firestore DB
-
+// implement Google Map
 
 export const MyGoogleMap = () => {
-    const initialLocation = { lat:37.7258 , lng: -122.15 }; // Initial coordinates lat: 37.7258, lng: -122.15
+    const initialLocation = { lat:37.7258 , lng: -122.15 }; // Initial coordinates for San Francisco, CA
     const [center, setCenter] = useState(initialLocation);
     const [zoom, setZoom] = useState(10);
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [locationName, setLocationName] = useState<string | null>(null);
-    const [searchText, setSearchText] = useState<string>('San Francisco, CA'); // Initial location text
+    const [searchText, setSearchText] = useState<string>('San Francisco, CA'); // Initial location 
     const [trails, setTrails] = useState<Trail[]>([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
 
     // save trail to Google Firestore DB
-
     const saveTrailToFirestore = async (trail: Trail) => {
         const auth = getAuth();
         const currentUser = auth.currentUser;
@@ -102,6 +98,7 @@ export const MyGoogleMap = () => {
             return;
         }
 
+        // if a trail already exists in a profile, it won't be saved again
         const trailExists = await trailExistsInFirestore(trail.id, currentUser.uid);
         if (trailExists) {
             setSnackbarMessage("Trail already in profile.");
@@ -109,10 +106,10 @@ export const MyGoogleMap = () => {
             setOpenSnackbar(true);
             return;
         }
-    
+        // linking trail to a user via their userID
         const trailWithUserId = {
             ...trail,
-            userID: currentUser.uid  // adding the user's ID to the trail data
+            userID: currentUser.uid  
         };
     
         try {
@@ -121,25 +118,26 @@ export const MyGoogleMap = () => {
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
         } catch (error) {
-            setSnackbarMessage("Error saving trail: " + error.message);
+            setSnackbarMessage("Error saving trail: ");
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
         }
     };
     
-    // trail exists in db
+    // Check to see if the trail exists in the current user's database
     const trailExistsInFirestore = async (trailID: number, userID: string) => {
         const trailCollection = collection(db, 'trails');
         const trailSnapshot = await getDocs(query(trailCollection, where("id", "==", trailID), where("userID", "==", userID)));
-        return !trailSnapshot.empty; // returns true if trail exists, false otherwise
+        return !trailSnapshot.empty; // returns true if trail exists or false if it does not
     };
 
+    // Default structure to load Google Maps
     const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4", // Replace with your Google Maps API key
+        googleMapsApiKey: "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4", 
         libraries,
     });
 
-    // Fetch weather data for the given coordinates (lat, lng)
+    // Fetch weather data with latitude/longitude using OpenWeatherMap API
     const fetchWeatherData = async (lat: number, lng: number) => {
         const apiKey = "3a51d59febd65531fa015a4c56a3cbc5"; 
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=imperial`;
@@ -156,13 +154,15 @@ export const MyGoogleMap = () => {
 
 
     const onSearchButtonClick = () => {
-        // Fetch location data based on the entered search text
+
+        // Fetch location data based on what the user enters in the search box
         fetchLocationData(searchText);
     };
 
+    // Get user's location that they want to go to after inputing it in the search box
     const fetchLocationData = async (searchText: string) => {
         try {
-            const apiKey = "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4"; // Replace with your Google Maps API key
+            const apiKey = "AIzaSyAjmZKfxWB9JSR9XFgNSY5EK7wPv25Inq4"; 
             const response = await fetch(
                 `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(searchText)}&key=${apiKey}`
             );
@@ -176,12 +176,12 @@ export const MyGoogleMap = () => {
                     });
                     setZoom(15);
 
-                    // Fetch weather data for the new location
+                    // Fetch weather data for the entered location
                     fetchWeatherData(location.lat, location.lng);
-                        // Fetch trail data for the new location
+                    // Fetch trail data for the entered location
                     fetchTrailData(location.lat, location.lng, setTrails);
 
-                    // Set the location name in state
+                    // Set the location name in results
                     setLocationName(data.results[0].formatted_address);
                 }
             }
@@ -192,10 +192,10 @@ export const MyGoogleMap = () => {
 
     useEffect(() => {
       if (isLoaded) {
-          // Fetch weather data for the initial coordinates when the map loads
+          // Fetch weather data for the initial coordinates when the page opens
           fetchWeatherData(initialLocation.lat, initialLocation.lng);
 
-          // Fetch trail data for the initial coordinates when the map loads
+          // Fetch trail data for the initial coordinates when the page opens
          fetchTrailData(initialLocation.lat, initialLocation.lng, setTrails);
 
           // Set initial location name
@@ -207,21 +207,25 @@ export const MyGoogleMap = () => {
   if (!isLoaded) return "Loading Google Maps";
 
   return (
-    <div>
-        <NavBar />
-        <h1 className="headertext">Discover Trails</h1>
-        
-        <div style={{ position: 'relative', height: '86vh', width: '95%', marginLeft: 'auto' }}> {/* Adjusted size for the Google Map container */}
-            
-            <div style={{ 
-                position: 'absolute', 
-                top: '10px', 
-                left: '50%', 
-                transform: 'translateX(-50%)',
-                zIndex: 1,
-                display: 'flex', 
-                alignItems: 'center' 
-            }}>
+            <div>
+                <NavBar />
+                <h1 className="headertext">Discover Trails</h1>
+                <div style={{ 
+                    position: 'relative', 
+                    height: '86vh', 
+                    width: '95%', 
+                    marginLeft: 'auto' 
+                    }}> 
+                    
+                <div style={{ 
+                    position: 'absolute', 
+                    top: '10px', 
+                    left: '50%', 
+                    transform: 'translateX(-50%)',
+                    zIndex: 1,
+                    display: 'flex', 
+                    alignItems: 'center' 
+                }}>
                 <input
                     type="text"
                     placeholder="Enter a location"
@@ -256,7 +260,7 @@ export const MyGoogleMap = () => {
                     position={{ lat: center.lat, lng: center.lng }}
                 />
                 
-                {/* Markers for the Trails remain untouched */}
+                {/* Markers for trails when they are found*/}
                 {trails.slice(0, 30).map(trail => (
                     <Marker
                         key={trail.id}
@@ -273,7 +277,7 @@ export const MyGoogleMap = () => {
                 ))}
             </GoogleMap>
 
-            {/* Trail Info */}
+            {/* Display Trail Info */}
             <div style={{
                 position: 'absolute',
                 top: '60px',
@@ -287,56 +291,72 @@ export const MyGoogleMap = () => {
                 maxHeight: '85vh',
                 overflowY: 'auto'
             }}>
-                <h2 style={{ textAlign: 'center' }}>Trail Info</h2>
-                {trails.length === 0 && <p>No trails available.</p>}
-                {trails.slice(0, 30).map(trail => (
-                    <div key={trail.id} style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: '15px',
-                        border: '1px solid black',
-                        padding: '10px',
-                        borderRadius: '5px',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
-                        {/* Image */}
-                        <img
-                            src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'}
-                            alt="trail image"
-                            style={{
-                                height: '150px',
-                                width: '150px',
-                                marginRight: '15px',
-                                borderRadius: '5px',
-                            }}
-                            onError={(e) => {
-                                const imgElement = e.target as HTMLImageElement;
-                                const defaultImageUrl = 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'; // Replace with your default image URL
-                        
-                                // Check if the image source is the default URL (i.e., it has already been replaced once)
-                                if (imgElement.src !== defaultImageUrl) {
-                                    imgElement.src = defaultImageUrl;
-                                } else {
-                                    // Handle the case where the image couldn't be loaded even with the default URL
-                                    // You can add additional fallbacks or error handling here
-                                    console.error(`Error loading image for trail: ${trail.name}`);
-                                }
-                            }}
-                        />
-                        {/* Trail Details */}
-                        <div style={{ flex: 1, marginRight: '15px', display: 'flex', flexDirection: 'column' }}>
-                            <h3 style={{ marginBottom: '5px', color: '#c4893f', textAlign: 'left' }}>{trail.name}</h3>
+            <h2 style={{ textAlign: 'center' }}>Trail Info</h2>
+            {trails.length === 0 && <p>No trails available.</p>}
+            {trails.slice(0, 30).map(trail => (
+                <div key={trail.id} style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginBottom: '15px',
+                    border: '1px solid black',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+            }}>
+            {/* Image For Trails */}
+            <img
+                src={trail.thumbnail || 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'}
+                alt="trail image"
+                style={{
+                    height: '150px',
+                    width: '150px',
+                    marginRight: '15px',
+                    borderRadius: '5px',
+                }}
+
+                //  {/* If the trail has no thumbnail value, a default image will display */}
+                onError={(e) => {
+                    const imgElement = e.target as HTMLImageElement;
+                    const defaultImageUrl = 'https://www.pacificfoodmachinery.com.au/media/catalog/product/placeholder/default/no-product-image-400x400_6.png'; 
+            
+                
+                    if (imgElement.src !== defaultImageUrl) {
+                        imgElement.src = defaultImageUrl;
+                    } else {
+               
+                        console.error(`Error loading image for trail: ${trail.name}`);
+                            }
+                        }}
+                />
+                        {/* Display Trail Details with styling */}
+                        <div style={{ 
+                            flex: 1, 
+                            marginRight: '15px', 
+                            display: 'flex', 
+                            flexDirection: 'column' 
+                            }}>
+                            <h3 style={{ 
+                                marginBottom: '5px', 
+                                color: '#c4893f', 
+                                textAlign: 'left' 
+                                }}>
+                                    {trail.name}
+                            </h3>
                             <p style={{ marginBottom: '2px' }}><strong>City:</strong> {trail.city}</p>
                             <p style={{ marginBottom: '2px' }}><strong>Region:</strong> {trail.region}</p>
                             <p style={{ marginBottom: '2px' }}><strong>Length:</strong> {trail.length} miles</p>
                             <p style={{ marginBottom: '2px' }}><strong>Rating:</strong> {trail.rating}</p>
-                            <div style={{ flex: 1, maxHeight: '150px', overflow: 'hidden' }}>
+                            <div style={{ 
+                                flex: 1, 
+                                maxHeight: '150px',
+                                 overflow: 'hidden' 
+                            }}>
                                 <p style={{
                                     marginBottom: '2px',
-                                    overflow: 'hidden', /* Hide overflowing content */
-                                    textOverflow: 'ellipsis', /* Show ellipsis for truncated text */
-                                    whiteSpace: 'pre-line', /* Allow word wrap */
+                                    overflow: 'hidden', 
+                                    textOverflow: 'ellipsis', 
+                                    whiteSpace: 'pre-line',
                                     overflowWrap: 'break-word',
                                     wordBreak: 'break-all',
                                     display: '-webkit-box',
@@ -347,7 +367,7 @@ export const MyGoogleMap = () => {
                                     <strong>Description:</strong> {trail.description}
                                 </p>
                             </div>
-                            {/* Save Trail Button */}
+                           
                             <Button
                                 sx={{
                                     backgroundColor: 'darkorange',
@@ -374,13 +394,14 @@ export const MyGoogleMap = () => {
                     </Alert>
                 </Snackbar>
             </div>
+
             {/* Weather Info */}
             {weather && (
                 <div style={{
                     position: 'absolute',
                     bottom: '40px',
                     right: '80px',
-                    background: 'linear-gradient(135deg, rgba(0,0,0,0.9), rgba(128,128,128,0.9))', // Black to grey gradient
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.9), rgba(128,128,128,0.9))', 
                     padding: '10px',
                     borderRadius: '8px',
                     color: '#ffffff',
@@ -393,7 +414,7 @@ export const MyGoogleMap = () => {
                 onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
                     <h2 style={{
-                        fontSize: '10px', // Reduced the font size
+                        fontSize: '10px', 
                         borderBottom: '1px solid white', 
                         paddingBottom: '5px', 
                         marginBottom: '10px',

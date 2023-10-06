@@ -1,4 +1,5 @@
-import React, {useState, useEffect } from 'react';
+// external imports
+import _React, {useState, useEffect } from 'react';
 import { styled } from '@mui/system';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';

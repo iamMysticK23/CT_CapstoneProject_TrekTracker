@@ -1,18 +1,16 @@
 // external imports
-import * as React from 'react';
+import * as _React from 'react';
 import { useState } from 'react';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { 
     onAuthStateChanged,
     getAuth,
-    GoogleAuthProvider,
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword, 
-    Auth} from 'firebase/auth';
-
+    signInWithEmailAndPassword,
+    User, 
+    } from 'firebase/auth';
 import { setDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -34,7 +32,6 @@ import homepage_image from '../../assets/Images/bike_auth.jpeg';
 
 
 // styles for sign in/ sign up
-
 const authStyles = {
     main: {
         backgroundImage: `linear-gradient(rgba(0,0,0, 0.2), rgba(0,0,0, 0.3)), url(${homepage_image});`,
@@ -62,7 +59,6 @@ const authStyles = {
 }
 
 // interfaces for functions
-
 interface Props {
     title: string;
 }
@@ -81,7 +77,7 @@ interface SubmitProps {
 // message alerts
 export type MessageType ='error' | 'warning' | 'info' | 'success'
 
-
+// Google login feature
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const GoogleButton = (_props: ButtonProps) => {
 
@@ -90,7 +86,7 @@ const GoogleButton = (_props: ButtonProps) => {
     const [ messageType, setMessageType ] = useState<MessageType>()
     const navigate = useNavigate()
     const auth = getAuth()
-    const [ signInWithGoogle, user, loading, error ] = useSignInWithGoogle(auth)
+    const [ signInWithGoogle, loading, error ] = useSignInWithGoogle(auth)
 
     const signIn = async () => {
         await signInWithGoogle();
@@ -110,7 +106,7 @@ const GoogleButton = (_props: ButtonProps) => {
         })
 
         if (error) {
-            setMessage(error.message)
+            // setMessage(error.message)
             setMessageType('error')
             setOpen(true)
         }
@@ -129,6 +125,7 @@ const GoogleButton = (_props: ButtonProps) => {
                 onClick = { signIn }
             >
                 Google Sign In
+
             </Button>
             <Snackbar
                 open={open}
@@ -147,8 +144,6 @@ const GoogleButton = (_props: ButtonProps) => {
 
 // sign in user
 const SignInUser = () => {
-
-
 
     const [ open, setOpen ] = useState(false)
     const [ message, setMessage ] = useState<string>()
@@ -177,7 +172,6 @@ const SignInUser = () => {
             setTimeout(() => {navigate('/googlemap')}, 2000)
         })
         .catch((error) => {
-            const errorCode = error.code
             const errorMessage = error.message
             setMessage(errorMessage)
             setMessageType('error')
@@ -213,8 +207,8 @@ const SignInUser = () => {
 
 }
 
-// create profile 
-const createUserProfile = async (user) => {
+// create a default user profile on Google Firebase Authentication
+const createUserProfile = async (user: User) => {
     const userRef = doc(db, 'users', user.uid);
     
     const snap = await getDoc(userRef);
@@ -227,7 +221,7 @@ const createUserProfile = async (user) => {
             email,
             displayName,
             createdAt,
-            // ... any other default data you want to set
+         
         });
     }
 };
@@ -262,7 +256,6 @@ const RegisterUser = () => {
             setTimeout(() => {navigate('/googlemap')}, 2000)
         })
         .catch((error) => {
-            const errorCode = error.code
             const errorMessage = error.message
             setMessage(errorMessage)
             setMessageType('error')
@@ -297,7 +290,7 @@ const RegisterUser = () => {
     )
 
 }
-
+// once a user is signed in, they are routed to the Google Map
 export const AuthComponent = (props: Props) => {
 
     const [ open, setOpen ] = useState(false)
@@ -308,7 +301,6 @@ export const AuthComponent = (props: Props) => {
         setOpen(false)
         navigate('/googlemap')
     }
-
 
 
     return (
