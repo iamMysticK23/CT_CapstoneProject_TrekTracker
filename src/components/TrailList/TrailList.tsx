@@ -129,7 +129,7 @@ export const TrailList = () => {
             overflow: 'auto'    
         }}>
           <NavBar />
-          <h1 className="headertext" style={{color:'#915c33' , fontWeight: 'bold'}}>My Saved Trail List</h1>
+          <h1 className="headertext" style={{color:'#a87731' , fontWeight: 'bold'}}>My Saved Trail List</h1>
           <p style = {{
               textAlign: 'center', 
               color: 'white', 
@@ -229,7 +229,8 @@ export const TrailList = () => {
                       fontSize:'16px', 
                       resize:'none',
                        border: '1px solid #ccc',
-                       borderRadius: '4px'
+                       borderRadius: '4px',
+                       padding: '10px'
                       }}
                   />
 

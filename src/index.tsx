@@ -7,7 +7,6 @@ import 'firebase/auth';
 
 // internal imports
 import {
-        AdminPage,
         AuthComponent, 
         MyGoogleMap, 
         Home, 
@@ -26,7 +25,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path='/' element={ <Home title={'TrekTracker'} />} />
             <Route path='/auth' element= {<AuthComponent title={'TrekTracker'} />} />
-            <Route path='/admin' element= {<AdminPage/>} />
             <Route path='/googlemap' element= {<MyGoogleMap/>} />
             <Route path='/traillist' element= {<TrailList/>} />
             <Route path='/gallery' element= {<ImageGallery/>} />
