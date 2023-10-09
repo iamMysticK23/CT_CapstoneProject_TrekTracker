@@ -1,3 +1,5 @@
 TrekTracker App - find trails and track your journeys
 
-# Add more to this at the end
+Full App is located here:
+https://github.com/iamMysticK23/CT_CapstoneProject_TrekTracker/tree/final-capstone-version2
+
