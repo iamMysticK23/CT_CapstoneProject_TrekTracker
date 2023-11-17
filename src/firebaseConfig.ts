@@ -2,6 +2,7 @@
 import { initializeApp }from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export const firebaseConfig = {
     apiKey: "AIzaSyCSBVqrIFxTFanbr8IHp2NxIlteXhHxF_Y",
@@ -16,3 +17,17 @@ const firebaseApp = initializeApp(firebaseConfig)
 
 export const db = getFirestore(firebaseApp)
 export const storage = getStorage(firebaseApp)
+
+// authentication
+const auth = getAuth(firebaseApp)
+let userUid = ''
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        userUid = user.uid
+    } else {
+        userUid = ''
+    }
+})
+
+export { auth, userUid }
