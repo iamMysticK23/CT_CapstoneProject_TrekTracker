@@ -18,6 +18,7 @@ const firebaseApp = initializeApp(firebaseConfig)
 export const db = getFirestore(firebaseApp)
 export const storage = getStorage(firebaseApp)
 
+
 // authentication
 const auth = getAuth(firebaseApp)
 let userUid = ''

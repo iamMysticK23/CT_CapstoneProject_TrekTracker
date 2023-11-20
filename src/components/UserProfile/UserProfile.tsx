@@ -1,7 +1,19 @@
 // external imports
 import React, { useState, useEffect } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject } from 'firebase/storage';
-import { Button, Snackbar, Alert, Card, CardContent, CardActions } from '@mui/material';
+import { 
+  Button, 
+  Snackbar, 
+  Alert,
+  Card, 
+  CardContent, 
+  CardActions, 
+  Dialog, 
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  DialogTitle,
+  LinearProgress } from '@mui/material';
 
 // internal imports
 import { NavBar } from '../sharedComponents';
@@ -15,6 +27,15 @@ export const ImageGallery = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [userUid, setUserUid] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  
+
+
+  // upload images section
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -24,12 +45,9 @@ export const ImageGallery = () => {
         // Fetch image URLs
         const fetchImageURLs = async () => {
           try {
-            console.log('Fetching image URLs for user:', user.uid);
             const storageRef = ref(storage, `user-images/${user.uid}`);
             const imageList = await listAll(storageRef);
-            console.log('Image list:', imageList); // Log image list for debugging
             const imageURLs = await Promise.all(imageList.items.map(async (item) => getDownloadURL(item)));
-            console.log('Image URLs:', imageURLs); // Log image URLs for debugging
             setImages(imageURLs);
           } catch (error) {
             console.error('Error fetching image URLs:', error);
@@ -46,6 +64,17 @@ export const ImageGallery = () => {
     return () => unsubscribe();
   }, []);
 
+  // Set uploading to true when the upload starts
+  const handleUploadStart = () => {
+    setUploading(true);
+  };
+
+  // Set uploading to false when the upload ends
+  const handleUploadEnd = () => {
+    setUploading(false);
+  };
+
+  
   // upload images
   const handleImageUpload = async (file: File) => {
     try {
@@ -54,10 +83,13 @@ export const ImageGallery = () => {
       const storageRef = ref(storage, storagePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
+      handleUploadStart()
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
           console.log(`Upload is ${progress}% done`);
         },
         (error) => {
@@ -67,11 +99,13 @@ export const ImageGallery = () => {
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           setImages((prevImages) => [...prevImages, downloadURL]);
+          handleUploadEnd()
           handleUploadMessage('Upload complete', 'success');
         }
       );
     } catch (error) {
       console.error('Error uploading image:', error);
+      handleUploadEnd()
       handleUploadMessage('Upload failed', 'error');
     }
   };
@@ -86,13 +120,46 @@ export const ImageGallery = () => {
   // delete images
   const deleteImage = async (imageURLToDelete: string) => {
     try {
-      const fileName = imageURLToDelete.split('/').pop() || ''; // Extract file name from URL
-      const storageRef = ref(storage, `user-images/${userUid}/${fileName}`);
-      await deleteObject(storageRef);
-      setImages((prevImages) => prevImages.filter((url) => url !== imageURLToDelete));
-      console.log('Image deleted successfully');
+      // Decode the URL
+      const decodedURL = decodeURIComponent(imageURLToDelete);
+      // Extract the file path from the decoded URL
+      const filePath = decodedURL.split('/o/')[1].split('?')[0];
+      // Replace %2F with /
+      const storagePath = filePath.replace(/%2F/g, '/');
+      console.log('Storage Path:', storagePath); // Log the storage path
+      const storageRef = ref(storage, storagePath);
+  
+      // Check if the file exists before deleting
+      getDownloadURL(storageRef)
+        .then(() => {
+          // If the file exists, delete it
+          deleteObject(storageRef);
+          console.log('Image deleted successfully');
+          // Update the state to remove the deleted image from the gallery
+          setImages((prevImages) => prevImages.filter((url) => url !== imageURLToDelete));
+        })
+        .catch((error) => {
+          // If the file doesn't exist, log an error message
+          console.error('File does not exist:', error);
+        });
     } catch (error) {
       console.error('Error deleting image:', error);
+    }
+  };
+  const handleDeleteConfirmationOpen = (imageURLToDelete: string) => {
+    setImageToDelete(imageURLToDelete);
+    setDeleteConfirmationOpen(true);
+  };
+
+  const handleDeleteConfirmationClose = () => {
+    setDeleteConfirmationOpen(false);
+    setImageToDelete(null);
+  };
+
+  const handleDeleteConfirmed = () => {
+    if (imageToDelete) {
+      deleteImage(imageToDelete);
+      handleDeleteConfirmationClose();
     }
   };
 
@@ -123,6 +190,8 @@ export const ImageGallery = () => {
       }}
     >
       <NavBar />
+
+
       <h1 className="headertext" style={{ color: '#edce32', fontWeight: 'bold' }}>
         Image Gallery
       </h1>
@@ -173,7 +242,7 @@ export const ImageGallery = () => {
             </CardContent>
             <CardActions style={{ display: 'flex', justifyContent: 'center' }}>
               <Button
-                onClick={() => deleteImage(url)}
+                onClick={() => handleDeleteConfirmationOpen(url)}
                 style={{ backgroundColor: 'orange', color: 'white' }}
               >
                 Delete
@@ -193,6 +262,38 @@ export const ImageGallery = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <div>
+      <Dialog open={uploading}>
+        <DialogTitle>
+        {uploadProgress !== undefined
+          ? `Uploading Image... ${Math.round(uploadProgress)}%`
+          : 'Uploading Image...'}
+      </DialogTitle>
+      <LinearProgress variant="determinate" value={uploadProgress} />
+    </Dialog>
+      </div>
+
+      <Dialog
+        open={imageToDelete !== null}
+        onClose={handleDeleteConfirmationClose}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this photo?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteConfirmationClose} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirmed} color="primary">
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 };
