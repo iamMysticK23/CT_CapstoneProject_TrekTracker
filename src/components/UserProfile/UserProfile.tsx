@@ -245,7 +245,7 @@ export const ImageGallery = () => {
             />
             <CardContent>
               <p style={{ color: 'darkorange', fontWeight: 'bold' }}>
-                Images uploaded by TrekTracker users.
+                Add your own description.
               </p>
             </CardContent>
             <CardActions style={{ display: 'flex', justifyContent: 'center' }}>
