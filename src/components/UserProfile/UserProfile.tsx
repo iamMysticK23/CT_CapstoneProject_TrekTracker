@@ -32,7 +32,9 @@ export const ImageGallery = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('');
   
+
 
 
   // upload images section
@@ -41,6 +43,11 @@ export const ImageGallery = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserUid(user.uid);
+        const userDisplayName = user.displayName || user.email || 'User';
+
+        // Set the user's name in the state
+        setUserName(userDisplayName);
+        
 
         // Fetch image URLs
         const fetchImageURLs = async () => {
@@ -57,6 +64,7 @@ export const ImageGallery = () => {
         fetchImageURLs();
       } else {
         setUserUid('');
+        setUserName('')
       }
     });
 
@@ -193,7 +201,7 @@ export const ImageGallery = () => {
 
 
       <h1 className="headertext" style={{ color: '#edce32', fontWeight: 'bold' }}>
-        Image Gallery
+        {`${userName}'s Image Gallery`}
       </h1>
       <p
         style={{
@@ -203,7 +211,7 @@ export const ImageGallery = () => {
           marginBottom: '20px',
         }}
       >
-        Add your image to the gallery for the community to see!
+        Keep track of your adventures with photos!
       </p>
 
       <label
