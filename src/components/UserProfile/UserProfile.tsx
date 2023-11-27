@@ -27,7 +27,7 @@ export const ImageGallery = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [, setDeleteConfirmationOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('');
   
