@@ -5,9 +5,6 @@ import {
   Button, 
   Snackbar, 
   Alert,
-  Card, 
-  CardContent, 
-  CardActions, 
   Dialog, 
   DialogContent,
   DialogContentText,
@@ -232,33 +229,27 @@ export const ImageGallery = () => {
         </Button>
       </label>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {images.map((url, index) => (
-          <Card
-            key={index}
-            style={{ margin: '8px', maxWidth: '300px', marginLeft: '120px', backgroundColor: '#32453C' }}
-          >
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+         {images.map((url, index) => (
+          <div key={index} style={{ margin: '35px 20px', maxWidth: '300px', width: '100%', maxHeight: '300px', backgroundColor: '#32453C', position: 'relative' }}>
             <img
               src={url}
               alt={`Image ${index}`}
-              style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
-            <CardContent>
-              <p style={{ color: 'darkorange', fontWeight: 'bold' }}>
-                Add your own description.
-              </p>
-            </CardContent>
-            <CardActions style={{ display: 'flex', justifyContent: 'center' }}>
+
+            <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.7)', padding: '8px', textAlign: 'center' }}>
               <Button
                 onClick={() => handleDeleteConfirmationOpen(url)}
                 style={{ backgroundColor: 'orange', color: 'white' }}
               >
                 Delete
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
+            </Button>
+        </div>
       </div>
+    ))}
+  </div>
+
 
       <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleCloseSnackbar}>
         <Alert
